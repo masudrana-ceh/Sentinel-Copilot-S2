@@ -151,3 +151,40 @@ body {
     --color-border: rgba(45, 212, 191, 0.3);
     --shadow-glow: 0 0 20px rgba(45, 212, 191, 0.3);
 }
+
+[data-theme="sentinel-dark"] {
+    /* Sentinel Command Center - Tactical Dark */
+    --color-bg-primary: #0a0a0f;
+    --color-bg-gradient: radial-gradient(ellipse at 20% 50%, #0d1f1a 0%, #0a0a0f 50%, #0f0a1a 100%);
+    --color-bg-secondary: rgba(10, 10, 15, 0.85);
+    --color-text-primary: #e8f5e9;
+    --color-text-secondary: #81c784;
+    --color-accent: #00e676;
+    /* Neon Green */
+    --color-accent-hover: #00c853;
+    --color-accent-dim: rgba(0, 230, 118, 0.12);
+    --color-border: rgba(0, 230, 118, 0.25);
+    --font-heading: 'Outfit', sans-serif;
+    --glass-bg: rgba(10, 10, 15, 0.75);
+    --glass-border: 1px solid rgba(0, 230, 118, 0.15);
+    --shadow-glow: 0 0 20px rgba(0, 230, 118, 0.15), 0 0 60px rgba(0, 230, 118, 0.05);
+}
+
+[data-theme="hacker"] {
+    /* Terminal Hacker - CRT Matrix */
+    --color-bg-primary: #000000;
+    --color-bg-gradient: linear-gradient(180deg, #000000 0%, #001a00 50%, #000000 100%);
+    --color-bg-secondary: rgba(0, 10, 0, 0.9);
+    --color-text-primary: #33ff33;
+    --color-text-secondary: #1aaa1a;
+    --color-accent: #33ff33;
+    /* Matrix Green */
+    --color-accent-hover: #66ff66;
+    --color-accent-dim: rgba(51, 255, 51, 0.1);
+    --color-border: rgba(51, 255, 51, 0.3);
+    --font-heading: 'Courier New', monospace;
+    --font-body: 'Courier New', monospace;
+    --glass-bg: rgba(0, 5, 0, 0.85);
+    --glass-border: 1px solid rgba(51, 255, 51, 0.25);
+    --shadow-glow: 0 0 10px rgba(51, 255, 51, 0.4), 0 0 40px rgba(51, 255, 51, 0.1);
+}

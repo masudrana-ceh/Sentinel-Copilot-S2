@@ -41,7 +41,7 @@ export const SUBJECTS = {
             'Packet Analysis'
         ],
         pedagogy: 'packet-first',
-        toolkit: ['subnet-calculator', 'port-lookup', 'cidr-converter', 'protocol-diagram'],
+        toolkit: ['subnet-calculator', 'port-lookup', 'cidr-converter', 'protocol-diagram', 'bandwidth-calculator', 'dns-lookup-simulator'],
         promptStyle: 'Always explain concepts starting from the packet header structure (bits/bytes layout) before discussing high-level theory. Reference RFC documents. Use Wireshark filter examples where applicable.',
         examType: 'practical + theory',
         description: 'Deep dive into networking protocols, packet analysis, and infrastructure design.'
@@ -69,7 +69,7 @@ export const SUBJECTS = {
             'File Inclusion (LFI/RFI)'
         ],
         pedagogy: 'attack-chain',
-        toolkit: ['payload-generator', 'encoding-decoder', 'header-analyzer', 'owasp-lookup'],
+        toolkit: ['encoding-decoder', 'header-analyzer', 'payload-generator'],
         promptStyle: 'Explain vulnerabilities using the attack chain: Reconnaissance → Exploitation → Post-Exploitation. Provide PoC examples safe for lab environments. Include mitigation strategies.',
         examType: 'practical CTF',
         description: 'Offensive security techniques for web application testing and vulnerability discovery.'
@@ -97,7 +97,7 @@ export const SUBJECTS = {
             'Middleware & Routing'
         ],
         pedagogy: 'code-first',
-        toolkit: ['api-tester', 'jwt-decoder', 'schema-validator', 'route-designer'],
+        toolkit: ['jwt-decoder', 'sql-formatter', 'php-validator', 'node-package-analyzer'],
         promptStyle: 'Start with working code examples using Express.js syntax. Then explain the underlying concepts. Include package.json dependencies and terminal commands.',
         examType: 'project + oral',
         description: 'Server-side development with Node.js, REST APIs, and database integration.'
@@ -125,7 +125,7 @@ export const SUBJECTS = {
             'Privilege Escalation Techniques'
         ],
         pedagogy: 'cli-first',
-        toolkit: ['cli-builder', 'man-simplifier', 'permission-calculator', 'cron-generator'],
+        toolkit: ['permission-calculator', 'cron-generator', 'command-builder', 'linux-cheatsheet'],
         promptStyle: 'Provide the exact Bash command to demonstrate the concept IMMEDIATELY. Then explain each flag and option. Assume Kali Linux or Debian-based distro context.',
         examType: 'practical terminal',
         description: 'Command-line mastery and Linux administration for offensive security.'
@@ -153,7 +153,7 @@ export const SUBJECTS = {
             'Writeup Documentation'
         ],
         pedagogy: 'hint-ladder',
-        toolkit: ['base-converter', 'hash-identifier', 'stego-helper', 'crypto-toolbox'],
+        toolkit: ['base-converter', 'hash-identifier', 'cipher-decoder'],
         promptStyle: 'Use a hint-ladder approach: Start with the smallest nudge. Only reveal more if explicitly asked. Teach methodology and thinking patterns, not just solutions. Reference CTF platforms like HackTheBox, TryHackMe.',
         examType: 'CTF competition',
         description: 'Competition-style hacking challenges covering crypto, forensics, and exploitation.'
@@ -181,7 +181,7 @@ export const SUBJECTS = {
             'Code Review Practices'
         ],
         pedagogy: 'annotated-code',
-        toolkit: ['regex-tester', 'code-formatter', 'syntax-highlighter', 'script-templates'],
+        toolkit: ['regex-tester', 'code-analyzer'],
         promptStyle: 'Provide annotated code with inline comments explaining every significant line. Compare Python, Bash, and PowerShell approaches when relevant. Include shebang lines and execution instructions.',
         examType: 'practical + code review',
         description: 'Automation scripting and static analysis across Python, Bash, and PowerShell.'
@@ -209,7 +209,7 @@ export const SUBJECTS = {
             'Privacy by Design (Art. 25)'
         ],
         pedagogy: 'case-based',
-        toolkit: ['gdpr-article-lookup', 'dpia-checklist', 'breach-timeline', 'rights-flowchart'],
+        toolkit: ['gdpr-article-lookup', 'privacy-checklist'],
         promptStyle: 'Reference specific GDPR articles (e.g., Art. 6, Art. 17) and real European court cases (CJEU decisions). Use scenario-based explanations for practical understanding.',
         examType: 'written exam',
         description: 'European data protection law, GDPR compliance, and IT legal frameworks.'
@@ -262,7 +262,7 @@ export const PEDAGOGY_STYLES = {
 
 export const CONSTANTS = {
     DB_NAME: 's2-sentinel-db',
-    DB_VERSION: 1,
+    DB_VERSION: 4,
     DEFAULT_MODEL_CEREBRAS: 'llama-3.3-70b',
     DEFAULT_MODEL_GEMINI: 'gemini-1.5-flash',
     STORAGE_KEYS: {
@@ -275,7 +275,7 @@ export const CONSTANTS = {
     CHUNK_SIZE: 500,
     CHUNK_OVERLAP: 50,
     MAX_CONTEXT_CHUNKS: 5,
-    THEMES: ['glass', 'light', 'midnight', 'sentinel-dark', 'cyber', 'hacker']
+    THEMES: ['glass', 'sentinel-dark', 'hacker', 'midnight', 'cyber', 'ocean', 'forest', 'nebula', 'aurora', 'sunset', 'lavender', 'light']
 };
 
 export const SYSTEM_PROMPTS = {

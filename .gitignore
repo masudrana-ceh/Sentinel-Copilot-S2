@@ -1,0 +1,66 @@
+# ══════════════════════════════════════════
+# S2-Sentinel Copilot — Root .gitignore
+# ══════════════════════════════════════════
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# ── Virtual Environments ──
+venv/
+.venv/
+ENV/
+env/
+
+# ── IDE / Editor ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ── OS Files ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Runtime Data ──
+server/data/
+server/logs/
+data/prompts/
+
+# ── ChromaDB / Vector Store ──
+chroma/
+chromadb/
+
+# ── Environment Variables ──
+.env
+.env.local
+.env.*.local
+.env.production
+
+# ── Node (if ever used) ──
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ── Misc ──
+*.bak
+*.tmp
+*.temp
+.cache/

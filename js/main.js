@@ -88,7 +88,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Initialize core services
         console.log('[Init] Starting StorageIDB...');
-        await StorageIDB.init();
+        await Promise.race([
+            StorageIDB.init(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error(
+                'IndexedDB init timed out. Close other tabs with this site and refresh.'
+            )), 5000))
+        ]);
         console.log('[Init] StorageIDB ready');
 
         console.log('[Init] Starting Analytics...');
@@ -195,6 +200,7 @@ function handleRoute() {
 
         // End any existing analytics session
         Analytics.endSession();
+        Workspace.destroy();
 
         switch (path) {
             case 'subject':
@@ -304,6 +310,9 @@ function setupGlobalListeners() {
     document.addEventListener('click', (e) => {
         if (e.target.closest('#settings-btn')) {
             Modal.toggle('settings-modal', true);
+            // Render theme picker when settings opens
+            const pickerContainer = document.getElementById('theme-picker-container');
+            if (pickerContainer) ThemeManager.renderPicker(pickerContainer);
         }
     });
 

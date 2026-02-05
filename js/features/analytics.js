@@ -48,12 +48,13 @@ export const Analytics = {
 
     /**
      * Start a study session for a subject
+     * Also updates global streak & session count
      * @param {string} subjectId - Subject identifier
      */
-    startSession(subjectId) {
+    async startSession(subjectId) {
         // End any existing session first
         if (this.currentSession) {
-            this.endSession();
+            await this.endSession();
         }
 
         this.currentSession = {
@@ -62,7 +63,45 @@ export const Analytics = {
             interactions: 0
         };
 
+        // ── Global Stats: streak & session counter ──
+        try {
+            await StorageIDB.incrementGlobalStat('totalSessions', 1);
+            await this._updateStreak();
+        } catch (e) {
+            console.warn('[Analytics] Global stats update failed:', e);
+        }
+
         console.log(`[Analytics] Session started: ${subjectId}`);
+    },
+
+    /**
+     * Update study streak based on lastStudyDate vs today
+     * @private
+     */
+    async _updateStreak() {
+        const today = new Date().toDateString(); // e.g. "Thu Jun 12 2025"
+        const lastDate = await StorageIDB.getGlobalStat('lastStudyDate', null);
+
+        if (lastDate === today) return; // Already studied today
+
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+        if (lastDate === yesterday) {
+            // Consecutive day — extend streak
+            await StorageIDB.incrementGlobalStat('currentStreak', 1);
+        } else if (lastDate !== today) {
+            // Streak broken — reset to 1
+            await StorageIDB.setGlobalStat('currentStreak', 1);
+        }
+
+        // Update best streak
+        const current = await StorageIDB.getGlobalStat('currentStreak', 1);
+        const best = await StorageIDB.getGlobalStat('bestStreak', 0);
+        if (current > best) {
+            await StorageIDB.setGlobalStat('bestStreak', current);
+        }
+
+        await StorageIDB.setGlobalStat('lastStudyDate', today);
     },
 
     /**
@@ -105,6 +144,7 @@ export const Analytics = {
 
     /**
      * Record a quiz score
+     * Also tracks topics learned globally
      * @param {string} subjectId - Subject identifier
      * @param {number} score - Score achieved
      * @param {number} total - Total possible score
@@ -121,6 +161,20 @@ export const Analytics = {
             await StorageIDB.updateAnalytics(subjectId, {
                 weakTopic: topic
             });
+        }
+
+        // ── Global Stats: track topics encountered ──
+        try {
+            const subject = SUBJECTS[subjectId];
+            if (subject) {
+                await StorageIDB.addLearnedTopic(subject.name);
+            }
+            // Also track individual quiz topics
+            for (const topic of weakTopics) {
+                await StorageIDB.addLearnedTopic(topic);
+            }
+        } catch (e) {
+            console.warn('[Analytics] Topic tracking failed:', e);
         }
 
         console.log(`[Analytics] Quiz recorded: ${subjectId}, ${score}/${total}`);
@@ -154,8 +208,14 @@ export const Analytics = {
         // Study Time Pie Chart
         await this.renderStudyTimePie(grid, allAnalytics);
 
+        // Weekly Progress Bar Chart
+        await this.renderWeeklyProgress(grid, allAnalytics);
+
         // Quiz Performance Line Chart
         await this.renderQuizPerformance(grid, allAnalytics);
+
+        // Weak Topics Panel
+        await this.renderWeakTopics(grid, allAnalytics);
 
         // Subject Stats Cards
         await this.renderSubjectStats(container, allAnalytics);
@@ -313,6 +373,158 @@ export const Analytics = {
     },
 
     /**
+     * Render weekly progress bar chart (hours per day, last 7 days)
+     */
+    async renderWeeklyProgress(container, analyticsData) {
+        if (!this.chartJsLoaded) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'glass-effect p-6 rounded-xl';
+        wrapper.innerHTML = `
+            <h3 class="text-lg font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-week"></i> Weekly Study Progress
+            </h3>
+            <canvas id="weekly-progress" height="250"></canvas>
+        `;
+        container.appendChild(wrapper);
+
+        const ctx = document.getElementById('weekly-progress').getContext('2d');
+
+        // Aggregate sessions by day for last 7 days
+        const days = [];
+        const dayLabels = [];
+        const DAY_MS = 86400000;
+        const now = Date.now();
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        for (let i = 6; i >= 0; i--) {
+            const dayStart = new Date(now - i * DAY_MS);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = dayStart.getTime() + DAY_MS;
+            
+            let totalMinutes = 0;
+            analyticsData.forEach(a => {
+                (a.sessions || []).forEach(s => {
+                    if (s.timestamp >= dayStart.getTime() && s.timestamp < dayEnd) {
+                        totalMinutes += s.duration || 0;
+                    }
+                });
+            });
+
+            days.push(Math.round(totalMinutes / 60 * 10) / 10); // hours with 1 decimal
+            const d = new Date(dayStart);
+            dayLabels.push(`${dayNames[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`);
+        }
+
+        if (this.charts['weekly-progress']) {
+            this.charts['weekly-progress'].destroy();
+        }
+
+        this.charts['weekly-progress'] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'Hours Studied',
+                    data: days,
+                    backgroundColor: days.map(d => d > 0 ? '#10b981' : '#374151'),
+                    borderColor: days.map(d => d > 0 ? '#34d399' : '#4b5563'),
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    maxBarThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#e0e0e0',
+                            callback: (v) => v + 'h'
+                        },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    x: {
+                        ticks: { color: '#e0e0e0', font: { size: 10 } },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => `${ctx.raw} hours studied`
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    /**
+     * Render weak topics / focus areas panel
+     */
+    async renderWeakTopics(container, analyticsData) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'glass-effect p-6 rounded-xl';
+
+        // Collect all weak topics across subjects
+        const allWeak = [];
+        analyticsData.forEach(a => {
+            const subject = SUBJECTS[a.subjectId];
+            if (subject && a.weakTopics?.length > 0) {
+                a.weakTopics.forEach(topic => {
+                    allWeak.push({ topic, subject: subject.name.split(' ')[0], color: subject.color, subjectId: a.subjectId });
+                });
+            }
+        });
+
+        // Get due review counts
+        let totalDueReviews = 0;
+        try {
+            for (const subjectId of Object.keys(SUBJECTS)) {
+                const due = await StorageIDB.getDueReviews(subjectId, 100);
+                totalDueReviews += due.length;
+            }
+        } catch (e) { /* quiz_reviews may not exist yet */ }
+
+        wrapper.innerHTML = `
+            <h3 class="text-lg font-bold text-emerald-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-bullseye"></i> Focus Areas
+            </h3>
+            ${totalDueReviews > 0 ? `
+                <div class="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
+                    <i class="fas fa-redo text-amber-400"></i>
+                    <div>
+                        <div class="text-sm font-medium text-amber-300">${totalDueReviews} questions due for review</div>
+                        <div class="text-xs text-gray-400">Go to any subject's Quiz tab to review</div>
+                    </div>
+                </div>
+            ` : ''}
+            ${allWeak.length > 0 ? `
+                <div class="space-y-2">
+                    ${allWeak.slice(0, 8).map(w => `
+                        <div class="flex items-center gap-3 p-2 rounded-lg bg-gray-800/30">
+                            <div class="w-2 h-2 rounded-full flex-shrink-0" style="background: ${w.color};"></div>
+                            <span class="text-sm text-gray-300 flex-1">${w.topic}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: ${w.color}20; color: ${w.color};">${w.subject}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <div class="text-center py-8 text-gray-400">
+                    <i class="fas fa-check-circle text-3xl text-emerald-500/50 mb-3"></i>
+                    <p class="text-sm">No weak topics yet</p>
+                    <p class="text-xs text-gray-500 mt-1">Take quizzes to discover focus areas</p>
+                </div>
+            `}
+        `;
+        container.appendChild(wrapper);
+    },
+
+    /**
      * Render subject statistics cards
      */
     async renderSubjectStats(container, analyticsData) {
@@ -391,7 +603,7 @@ export const Analytics = {
     },
 
     /**
-     * Get summary statistics
+     * Get summary statistics (including global stats)
      */
     async getSummary() {
         const allAnalytics = await StorageIDB.getAllAnalytics();
@@ -409,13 +621,25 @@ export const Analytics = {
             ) || 0
             : 0;
 
+        // Global stats from IndexedDB
+        let globalStats = {};
+        try {
+            globalStats = await StorageIDB.getAllGlobalStats();
+        } catch (e) { /* global_stats store may not exist yet */ }
+
         return {
             totalStudyTime: this.formatTime(totalTime),
             totalStudyMinutes: totalTime,
             totalQuizzes,
             averageScore: avgScore,
             subjectsActive: allAnalytics.filter(a => a.studyTime > 0).length,
-            lastActive: Math.max(...allAnalytics.map(a => a.lastAccessed || 0)) || null
+            lastActive: Math.max(...allAnalytics.map(a => a.lastAccessed || 0)) || null,
+            // Global stats
+            currentStreak: globalStats.currentStreak || 0,
+            bestStreak: globalStats.bestStreak || 0,
+            totalSessions: globalStats.totalSessions || 0,
+            topicsLearned: globalStats.topicsLearned?.length || 0,
+            lastStudyDate: globalStats.lastStudyDate || null
         };
     },
 
@@ -425,5 +649,167 @@ export const Analytics = {
     async exportData() {
         const allAnalytics = await StorageIDB.getAllAnalytics();
         return JSON.stringify(allAnalytics, null, 2);
+    },
+
+    /**
+     * Export a styled PDF study report using a print window
+     */
+    async exportStudyReport() {
+        const summary = await this.getSummary();
+        const allAnalytics = await StorageIDB.getAllAnalytics();
+        let allReviews = [];
+        try {
+            allReviews = await StorageIDB.getAllReviews();
+        } catch (e) { /* optional */ }
+
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Build per-subject data
+        const subjectRows = allAnalytics.filter(a => a.studyTime > 0 || a.quizScores?.length > 0).map(a => {
+            const subjectConfig = SUBJECTS[a.subjectId];
+            const name = subjectConfig?.name || a.subjectId;
+            const time = this.formatTime(a.studyTime || 0);
+            const quizzes = a.quizScores?.length || 0;
+            const avgScore = quizzes > 0 
+                ? Math.round(a.quizScores.reduce((s, q) => s + (q.score / q.total) * 100, 0) / quizzes) 
+                : '—';
+            const weakTopics = a.weakTopics?.slice(0, 5).join(', ') || '—';
+            const sessions = a.sessions?.length || 0;
+            return { name, time, quizzes, avgScore, weakTopics, sessions };
+        });
+
+        // Spaced repetition stats
+        const totalReviews = allReviews.length;
+        const masteredCount = allReviews.filter(r => r.correctCount >= 3).length;
+        const dueCount = allReviews.filter(r => new Date(r.nextReview) <= now).length;
+
+        const printHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>S2-Sentinel Study Report - ${dateStr}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a2e; padding: 40px; background: #fff; }
+        .header { text-align: center; margin-bottom: 32px; border-bottom: 3px solid #10b981; padding-bottom: 20px; }
+        .header h1 { font-size: 28px; color: #10b981; margin-bottom: 4px; }
+        .header .subtitle { font-size: 14px; color: #666; }
+        .header .date { font-size: 12px; color: #999; margin-top: 4px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #10b981; }
+        .stat-card .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .section { margin-bottom: 28px; }
+        .section h2 { font-size: 18px; color: #1a1a2e; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #10b981; color: #fff; padding: 10px 12px; text-align: left; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+        tr:nth-child(even) { background: #f8fafc; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-amber { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .footer { text-align: center; margin-top: 40px; font-size: 11px; color: #999; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        .sr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .sr-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; text-align: center; }
+        .sr-card .value { font-size: 24px; font-weight: 700; }
+        .sr-card .label { font-size: 11px; color: #666; margin-top: 2px; }
+        @media print { body { padding: 20px; } .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ S2-Sentinel Copilot — Study Report</h1>
+        <div class="subtitle">Semester 2 CS Engineering Progress Overview</div>
+        <div class="date">Generated: ${dateStr} at ${now.toLocaleTimeString()}</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="value">${summary.totalStudyTime}</div>
+            <div class="label">Total Study Time</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">${summary.totalQuizzes}</div>
+            <div class="label">Quizzes Taken</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">${summary.averageScore}%</div>
+            <div class="label">Average Score</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">${summary.subjectsActive}/8</div>
+            <div class="label">Active Subjects</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📚 Subject Breakdown</h2>
+        ${subjectRows.length > 0 ? `
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Study Time</th>
+                    <th>Sessions</th>
+                    <th>Quizzes</th>
+                    <th>Avg Score</th>
+                    <th>Weak Topics</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${subjectRows.map(r => `
+                <tr>
+                    <td><strong>${r.name}</strong></td>
+                    <td>${r.time}</td>
+                    <td>${r.sessions}</td>
+                    <td>${r.quizzes}</td>
+                    <td>${typeof r.avgScore === 'number' 
+                        ? `<span class="badge ${r.avgScore >= 80 ? 'badge-green' : r.avgScore >= 50 ? 'badge-amber' : 'badge-red'}">${r.avgScore}%</span>` 
+                        : r.avgScore}</td>
+                    <td style="font-size:11px;color:#666">${r.weakTopics}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>
+        ` : '<p style="color:#999;font-size:13px">No study data recorded yet. Start studying to see your progress!</p>'}
+    </div>
+
+    <div class="section">
+        <h2>🧠 Spaced Repetition</h2>
+        <div class="sr-grid">
+            <div class="sr-card">
+                <div class="value" style="color:#10b981">${totalReviews}</div>
+                <div class="label">Total Questions in Bank</div>
+            </div>
+            <div class="sr-card">
+                <div class="value" style="color:#f59e0b">${dueCount}</div>
+                <div class="label">Due for Review</div>
+            </div>
+            <div class="sr-card">
+                <div class="value" style="color:#6366f1">${masteredCount}</div>
+                <div class="label">Mastered (3+ correct)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>S2-Sentinel Copilot — Built by MIHx0 (Muhammad Izaz Haider)</p>
+        <p style="margin-top:4px">AI-Powered Study Platform for CS Engineering Semester 2</p>
+    </div>
+</body>
+</html>`;
+
+        // Open in a new print-friendly window
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        printWindow.document.write(printHTML);
+        printWindow.document.close();
+        
+        // Auto-trigger print dialog for PDF save
+        printWindow.onload = () => {
+            setTimeout(() => {
+                printWindow.print();
+            }, 400);
+        };
     }
 };

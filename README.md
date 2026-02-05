@@ -3,26 +3,30 @@
 > **Hyper-Intelligent AI Study Platform for CS Engineering Semester 2**  
 > Built specifically for Howest University Belgium
 
-![Version](https://img.shields.io/badge/version-1.0.0-emerald)
-![Phase](https://img.shields.io/badge/phase-3%2F6-blue)
-![Courses](https://img.shields.io/badge/courses-7-purple)
+![Version](https://img.shields.io/badge/version-1.6.0-emerald)
+![Phase](https://img.shields.io/badge/phase-6%2F6-brightgreen)
+![Courses](https://img.shields.io/badge/courses-8-purple)
+![Lines](https://img.shields.io/badge/lines-11.5k%2B-blue)
 ![AI](https://img.shields.io/badge/AI-Cerebras%20%7C%20Gemini-orange)
 
 ---
 
 ## 🎯 What is S2-Sentinel?
 
-S2-Sentinel Copilot is a **subject-aware AI tutor** that understands your specific courses, uses your uploaded materials for context, and teaches using the **optimal pedagogy style** for each subject.
+S2-Sentinel Copilot is a **subject-aware AI tutor** that understands your specific courses, uses your uploaded materials for context, and teaches using the **optimal pedagogy style** for each subject. All 6 development phases are complete — from foundation through AI integration, RAG, toolkits, analytics/quiz, and final polish.
 
 ### Key Differentiators
 
 | Feature | Description |
 |---------|-------------|
-| **7 Subjects Configured** | Each with unique teaching style |
+| **8 Subjects Configured** | Each with unique teaching style & dedicated tools |
 | **5-Layer Prompt System** | Identity → Expertise → Pedagogy → Examples → Context |
-| **Document RAG** | Upload PDFs, get context-aware answers |
-| **Subject Toolkits** | 15+ specialized tools per course |
-| **Study Analytics** | Track time, quizzes, weak topics |
+| **Document RAG** | Upload PDFs, get context-aware answers (TF-IDF + ChromaDB) |
+| **24 Subject Tools** | Across 7 subject-specific tool modules |
+| **Quiz System** | 4 question types with spaced repetition |
+| **12 Themes** | Glass, Sentinel-Dark, Hacker, and 9 more |
+| **Global Stats** | Streak tracking, sessions, topics learned |
+| **Study Analytics** | Track time, quizzes, weak topics with Chart.js |
 
 ---
 
@@ -37,6 +41,28 @@ S2-Sentinel Copilot is a **subject-aware AI tutor** that understands your specif
 | 🟣 Capture The Flag | 3 ECTS | Hint-Ladder | Base Converter, Hash ID |
 | 🔵 Scripting & Code Analysis | 6 ECTS | Annotated-Code | Regex Tester |
 | 🌸 Data Privacy & IT Law | 3 ECTS | Case-Based | GDPR Lookup |
+| 🤖 AI Security | 3 ECTS | Threat-Model | AI Threat Analyzer |
+
+---
+
+## 🎨 Themes
+
+12 fully-designed themes with CSS custom properties:
+
+| Theme | Style |
+|-------|-------|
+| Glass | Frosted glass morphism (default) |
+| Sentinel-Dark | Deep dark with emerald accents |
+| Hacker | Green-on-black terminal aesthetic |
+| Midnight | Deep blue night palette |
+| Cyber | Neon cyan & magenta |
+| Ocean | Cool blue-green depths |
+| Forest | Natural greens & earth tones |
+| Nebula | Purple cosmic gradients |
+| Aurora | Northern lights gradient |
+| Sunset | Warm orange & pink hues |
+| Lavender | Soft purple pastels |
+| Light | Clean white & light gray |
 
 ---
 
@@ -59,20 +85,20 @@ Click any subject card on the dashboard
 Drop your PDF course slides/notes for context-aware responses
 
 ### 5. Start Learning!
-Ask questions, use tools, take quizzes
+Ask questions, use tools, take quizzes, track your progress
 
 ---
 
-## 🏗️ Development Status
+## 🏗️ Development Status — All Phases Complete ✅
 
-### Phase 1: Foundation ✅ COMPLETE
+### Phase 1: Foundation ✅
 - [x] Project structure & SPA router
-- [x] 7 subjects configured with pedagogy styles
-- [x] IndexedDB storage (unlimited docs)
-- [x] State management (reactive)
+- [x] 8 subjects configured with pedagogy styles
+- [x] IndexedDB storage (8 object stores)
+- [x] Reactive state management
 - [x] UI shell, modals & components
 
-### Phase 2: AI Integration ✅ COMPLETE
+### Phase 2: AI Integration ✅
 - [x] Unified API layer (Cerebras + Gemini)
 - [x] Automatic failover between providers
 - [x] Response caching (memory + localStorage)
@@ -80,16 +106,46 @@ Ask questions, use tools, take quizzes
 - [x] Rate limiting & retry logic
 - [x] 5-layer subject prompt system
 
-### Phase 3: RAG Enhancement ✅ COMPLETE
+### Phase 3: RAG Enhancement ✅
 - [x] JavaScript TF-IDF engine (offline)
 - [x] Semantic text chunking
 - [x] Python backend with ChromaDB (optional)
 - [x] Sentence-transformers for embeddings
 - [x] Auto-detection (Python backend → JS fallback)
-- [x] PDF processing with PyMuPDF
+- [x] PDF processing with PDF.js + PyMuPDF
 
-### Phase 4-6: Upcoming
-See [docs/DEVELOPMENT-PHASES.md](docs/DEVELOPMENT-PHASES.md) for full roadmap.
+### Phase 4: Subject Toolkits ✅
+- [x] 24 tools across 7 subject-specific modules
+- [x] Modular architecture — `toolkit.js` imports 7 tool sub-modules from `tools/`
+- [x] Interactive tool UI in workspace tools tab
+- [x] Tool results integrated with AI chat context
+
+### Phase 5: Analytics & Quiz ✅
+- [x] Quiz system with 4 question types (MCQ, True/False, Fill-in, Short Answer)
+- [x] Spaced repetition scheduling
+- [x] Global stats: streak tracking, total sessions, topics learned
+- [x] Per-subject analytics with Chart.js visualizations
+- [x] Study time tracking & weak-topic detection
+
+### Phase 6: Polish & Finalization ✅
+- [x] 12 complete themes with CSS custom properties
+- [x] Workspace split into 4 sub-modules (chat, docs, tools-tab, quiz)
+- [x] Web search integration
+- [x] Toast notifications & loading states
+- [x] PWA manifest & service worker ready
+- [x] Full documentation (README, HOW_IT_WORKS, DEVELOPMENT-PHASES)
+
+---
+
+## 📊 Codebase Stats
+
+| Language | Files | Lines | Share |
+|----------|-------|-------|-------|
+| JavaScript | 27 | 8,459 | 73.6% |
+| Python | 11 | 1,752 | 15.2% |
+| CSS | 7 | 916 | 8.0% |
+| HTML | 1 | 372 | 3.2% |
+| **Total** | **46** | **11,499** | **100%** |
 
 ---
 
@@ -97,36 +153,86 @@ See [docs/DEVELOPMENT-PHASES.md](docs/DEVELOPMENT-PHASES.md) for full roadmap.
 
 ```
 S2-Sentinel-Copilot/
-├── index.html              # SPA entry point
-├── manifest.json           # PWA manifest
-├── README.md               # This file
+├── index.html                  # SPA entry point (372 lines)
+├── manifest.json               # PWA manifest
+├── README.md                   # This file
+│
 ├── docs/
-│   └── DEVELOPMENT-PHASES.md   # Full roadmap
+│   ├── HOW_IT_WORKS.md         # Architecture deep-dive
+│   └── DEVELOPMENT-PHASES.md   # Full 6-phase roadmap
+│
 ├── css/
-│   └── sentinel.css        # Custom styles
+│   ├── variables.css           # CSS custom properties & 12 themes
+│   ├── base.css                # Reset & typography
+│   ├── layout.css              # Grid & flex layouts
+│   ├── components.css          # Buttons, cards, modals
+│   ├── animations.css          # Transitions & keyframes
+│   ├── markdown.css            # AI response styling
+│   └── sentinel.css            # Sentinel-specific overrides
+│
 ├── js/
-│   ├── main.js             # Router & bootstrap
-│   ├── config-s2.js        # 7 subjects config
-│   ├── state-manager.js    # Reactive state
+│   ├── main.js                 # Router & bootstrap
+│   ├── config-s2.js            # 8 subjects config
+│   ├── state-manager.js        # Reactive state with subscriptions
+│   │
 │   ├── features/
-│   │   ├── prompt-builder.js   # 5-layer prompts
-│   │   ├── rag-engine.js       # TF-IDF + Python backend
-│   │   ├── toolkit.js          # Subject tools
-│   │   └── analytics.js        # Study tracking
+│   │   ├── prompt-builder.js   # 5-layer prompt assembly
+│   │   ├── rag-engine.js       # TF-IDF + ChromaDB hybrid
+│   │   ├── analytics.js        # Study tracking & charts
+│   │   ├── toolkit.js          # Tool orchestrator (imports 7 modules)
+│   │   └── tools/
+│   │       ├── networks.js     # Subnet calc, port lookup, etc.
+│   │       ├── pentesting.js   # Encoder, header analyzer, etc.
+│   │       ├── backend.js      # JWT decoder, SQL formatter, etc.
+│   │       ├── linux.js        # Permission calc, cron gen, etc.
+│   │       ├── ctf.js          # Base converter, hash ID, etc.
+│   │       ├── scripting.js    # Regex tester, etc.
+│   │       └── privacy.js      # GDPR lookup, etc.
+│   │
 │   ├── services/
 │   │   ├── api.js              # AI providers (Cerebras/Gemini)
-│   │   └── storage-idb.js      # IndexedDB
+│   │   ├── storage-idb.js      # IndexedDB (8 stores)
+│   │   └── web-search.js       # Web search integration
+│   │
 │   ├── views/
-│   │   ├── dashboard.js        # Subject grid
-│   │   └── workspace.js        # Chat interface
-│   └── ui/                     # UI utilities
+│   │   ├── dashboard.js        # Subject grid & global stats
+│   │   └── workspace/
+│   │       ├── workspace.js    # Workspace orchestrator
+│   │       ├── chat.js         # Chat tab logic
+│   │       ├── docs.js         # Documents tab logic
+│   │       ├── tools-tab.js    # Tools tab logic
+│   │       └── quiz.js         # Quiz tab logic
+│   │
+│   └── ui/
+│       ├── dom.js              # DOM utilities
+│       ├── modal.js            # Modal manager
+│       ├── theme.js            # Theme switcher (12 themes)
+│       └── toast.js            # Toast notifications
+│
 ├── server/                     # Python RAG Backend (optional)
-│   ├── start-server.bat        # One-click Windows startup
 │   ├── main.py                 # FastAPI application
-│   ├── rag.py                  # ChromaDB + embeddings
 │   ├── config.py               # Pydantic settings
-│   └── requirements.txt        # Python dependencies
-└── images/
+│   ├── requirements.txt        # Python dependencies
+│   ├── start-server.bat        # One-click Windows startup
+│   ├── start-server.sh         # One-click Linux/macOS startup
+│   ├── __init__.py
+│   ├── rag/
+│   │   ├── __init__.py
+│   │   ├── processor.py        # Document processing pipeline
+│   │   ├── pdf_processor.py    # PyMuPDF PDF extraction
+│   │   ├── chunker.py          # Semantic text chunking
+│   │   ├── vector_store.py     # ChromaDB vector store
+│   │   ├── bm25.py             # BM25 keyword search
+│   │   ├── query_expander.py   # Query expansion
+│   │   └── models.py           # Pydantic data models
+│   ├── data/
+│   │   └── chromadb/           # Persistent vector database
+│   └── logs/                   # Server logs
+│
+├── data/
+│   └── prompts/                # Prompt templates
+│
+└── images/                     # App icons & assets
 ```
 
 ---
@@ -137,7 +243,7 @@ For enhanced semantic search, you can run the Python backend with ChromaDB vecto
 
 ### Requirements
 - Python 3.10+ (tested with 3.13.9)
-- Windows (batch script provided)
+- Windows / Linux / macOS
 
 ### Quick Start
 
@@ -145,8 +251,11 @@ For enhanced semantic search, you can run the Python backend with ChromaDB vecto
 # Navigate to server folder
 cd server
 
-# Run the one-click startup script
+# Windows
 .\start-server.bat
+
+# Linux / macOS
+chmod +x start-server.sh && ./start-server.sh
 ```
 
 The script will automatically:
@@ -166,7 +275,7 @@ The script will automatically:
 
 ### Without Python Backend
 
-The app works fully without the Python backend - it will use the built-in JavaScript TF-IDF engine for document search. The frontend auto-detects which engine to use.
+The app works fully without the Python backend — it will use the built-in JavaScript TF-IDF engine for document search. The frontend auto-detects which engine to use.
 
 ---
 
@@ -176,15 +285,36 @@ The app works fully without the Python backend - it will use the built-in JavaSc
 |----------|------------|
 | **Frontend** | Vanilla JavaScript (ES Modules) |
 | **Styling** | Tailwind CSS + Custom Glass Effects |
-| **Storage** | IndexedDB (unlimited document storage) |
-| **AI** | Cerebras (Llama 3.3 70B) + Gemini 1.5 Flash |
-| **PDF** | PDF.js for document parsing |
+| **Storage** | IndexedDB (8 object stores) |
+| **AI Models** | Cerebras (Llama 3.3 70B) + Gemini 1.5 Flash |
+| **RAG** | TF-IDF (JS) + ChromaDB (Python) |
+| **PDF** | PDF.js (frontend) + PyMuPDF (backend) |
 | **Charts** | Chart.js for analytics |
-| **Markdown** | Marked.js + Prism.js |
+| **Markdown** | Marked.js + Prism.js (syntax highlighting) |
 | **Backend** | FastAPI + Uvicorn (Python, optional) |
 | **Vector DB** | ChromaDB (persistent storage) |
 | **Embeddings** | sentence-transformers (all-MiniLM-L6-v2) |
 | **NLP** | spaCy (semantic chunking) |
+
+---
+
+## 🔧 Architecture Highlights
+
+### Modular Design
+- **`toolkit.js`** dynamically imports 7 tool sub-modules from `js/features/tools/` — each subject gets its own tool file
+- **`workspace.js`** orchestrates 4 sub-modules in `js/views/workspace/` — chat, docs, tools-tab, and quiz
+- **Reactive state** via `state-manager.js` with subscription-based updates across all components
+
+### Quiz System
+- 4 question types: Multiple Choice, True/False, Fill-in-the-Blank, Short Answer
+- AI-generated questions based on subject context
+- Spaced repetition scheduling for optimal retention
+- Per-subject quiz history and performance tracking
+
+### Analytics & Stats
+- **Global stats**: Study streak, total sessions, topics learned
+- **Per-subject**: Time spent, quiz scores, weak topics
+- **Visualizations**: Chart.js bar/line/doughnut charts
 
 ---
 
@@ -210,14 +340,15 @@ Use Live Server extension
 | Document | Description |
 |----------|-------------|
 | [README.md](README.md) | Quick start & overview |
+| [HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | Architecture deep-dive |
 | [DEVELOPMENT-PHASES.md](docs/DEVELOPMENT-PHASES.md) | Full 6-phase roadmap |
 
 ---
 
 ## 🎓 About
 
-Built for **Muhammad Izaz Haider (MIHx0)**  
-Cybersecurity Student @ Howest University 🇧🇪  
+Built by **Muhammad Izaz Haider (MIHx0)**  
+Cybersecurity Student @ Howest University Belgium 🇧🇪  
 Junior DevSecOps & AI Security Engineer @ Damno Solutions  
 Founder of The PenTrix
 
@@ -225,7 +356,7 @@ Founder of The PenTrix
 
 ## 📜 License
 
-MIT License - Use freely, modify as needed.
+MIT License — Use freely, modify as needed.
 
 ---
 

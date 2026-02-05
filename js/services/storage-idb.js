@@ -27,9 +27,26 @@ export const StorageIDB = {
                 reject(request.error);
             };
 
+            request.onblocked = () => {
+                console.warn('IndexedDB blocked - close other tabs and refresh');
+                // Force close old connections and proceed
+                if (db) {
+                    db.close();
+                    db = null;
+                }
+            };
+
             request.onsuccess = () => {
                 db = request.result;
-                console.log('IndexedDB initialized:', DB_NAME);
+
+                // Handle version change from other tabs
+                db.onversionchange = () => {
+                    db.close();
+                    db = null;
+                    console.log('IndexedDB version change detected, closing connection');
+                };
+
+                console.log('IndexedDB initialized:', DB_NAME, 'v' + DB_VERSION);
                 resolve(db);
             };
 
@@ -76,6 +93,33 @@ export const StorageIDB = {
                     });
                     convStore.createIndex('subjectId', 'subjectId', { unique: false });
                     convStore.createIndex('timestamp', 'timestamp', { unique: false });
+                }
+
+                // Tool History store - tracks tool usage
+                if (!database.objectStoreNames.contains('tool_history')) {
+                    const toolStore = database.createObjectStore('tool_history', {
+                        keyPath: 'id',
+                        autoIncrement: true
+                    });
+                    toolStore.createIndex('toolId', 'toolId', { unique: false });
+                    toolStore.createIndex('subjectId', 'subjectId', { unique: false });
+                    toolStore.createIndex('timestamp', 'timestamp', { unique: false });
+                }
+
+                // Quiz Reviews store - spaced repetition scheduling
+                if (!database.objectStoreNames.contains('quiz_reviews')) {
+                    const reviewStore = database.createObjectStore('quiz_reviews', {
+                        keyPath: 'id',
+                        autoIncrement: true
+                    });
+                    reviewStore.createIndex('subjectId', 'subjectId', { unique: false });
+                    reviewStore.createIndex('nextReview', 'nextReview', { unique: false });
+                    reviewStore.createIndex('questionHash', 'questionHash', { unique: false });
+                }
+
+                // Global Stats store — streak, sessions, topics (v4)
+                if (!database.objectStoreNames.contains('global_stats')) {
+                    database.createObjectStore('global_stats', { keyPath: 'key' });
                 }
 
                 console.log('IndexedDB schema created/upgraded');
@@ -364,6 +408,247 @@ export const StorageIDB = {
     async setSetting(key, value) {
         await this.init();
         return this._put('settings', { key, value });
+    },
+
+    // ============ TOOL HISTORY OPERATIONS ============
+
+    /**
+     * Record a tool execution
+     * @param {string} toolId - Tool identifier
+     * @param {string} toolName - Tool display name
+     * @param {string} subjectId - Subject context
+     * @param {Array} inputs - Input values used
+     * @param {boolean} success - Whether execution succeeded
+     */
+    async recordToolUsage(toolId, toolName, subjectId, inputs = [], success = true) {
+        await this.init();
+        return this._add('tool_history', {
+            toolId,
+            toolName,
+            subjectId,
+            inputs,
+            success,
+            timestamp: Date.now()
+        });
+    },
+
+    /**
+     * Get recent tool usage for a subject
+     * @param {string} subjectId - Subject identifier
+     * @param {number} limit - Max results
+     * @returns {Promise<Array>} Recent tool usage sorted by timestamp desc
+     */
+    async getRecentTools(subjectId, limit = 5) {
+        await this.init();
+        const all = await this._getAllByIndex('tool_history', 'subjectId', subjectId);
+        return all.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
+    },
+
+    /**
+     * Get tool usage counts for a subject (aggregated)
+     * @param {string} subjectId - Subject identifier
+     * @returns {Promise<Object>} Map of toolId → { count, lastUsed }
+     */
+    async getToolUsageCounts(subjectId) {
+        await this.init();
+        const all = await this._getAllByIndex('tool_history', 'subjectId', subjectId);
+        const counts = {};
+        for (const entry of all) {
+            if (!counts[entry.toolId]) {
+                counts[entry.toolId] = { count: 0, lastUsed: 0 };
+            }
+            counts[entry.toolId].count++;
+            if (entry.timestamp > counts[entry.toolId].lastUsed) {
+                counts[entry.toolId].lastUsed = entry.timestamp;
+            }
+        }
+        return counts;
+    },
+
+    /**
+     * Get all tool history entries (across all subjects)
+     * @param {number} limit - Max results
+     * @returns {Promise<Array>} All tool history sorted by timestamp desc
+     */
+    async getAllToolHistory(limit = 50) {
+        await this.init();
+        const all = await this._getAll('tool_history');
+        return all.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
+    },
+
+    /**
+     * Get total tool executions count
+     * @returns {Promise<number>}
+     */
+    async getTotalToolExecutions() {
+        await this.init();
+        const all = await this._getAll('tool_history');
+        return all.length;
+    },
+
+    // ============ QUIZ REVIEW OPERATIONS (SPACED REPETITION) ============
+
+    /**
+     * Save a quiz question for spaced repetition review
+     * @param {Object} review - { subjectId, question, options, correctAnswer, userAnswer, isCorrect, topic, difficulty, type }
+     */
+    async saveQuizReview(review) {
+        await this.init();
+        const now = Date.now();
+        // Simple hash for dedup
+        const questionHash = this._simpleHash(review.question);
+
+        // Check if this question already exists
+        const existing = await this._getAllByIndex('quiz_reviews', 'questionHash', questionHash);
+        const existingForSubject = existing.find(r => r.subjectId === review.subjectId);
+
+        if (existingForSubject) {
+            // Update existing review
+            const updated = { ...existingForSubject };
+            updated.correctCount = review.isCorrect ? (updated.correctCount || 0) + 1 : 0;
+            updated.totalAttempts = (updated.totalAttempts || 0) + 1;
+            updated.lastAttempt = now;
+            updated.lastCorrect = review.isCorrect;
+            updated.nextReview = this._calculateNextReview(updated.correctCount);
+            return this._put('quiz_reviews', updated);
+        }
+
+        // New review entry
+        return this._add('quiz_reviews', {
+            ...review,
+            questionHash,
+            correctCount: review.isCorrect ? 1 : 0,
+            totalAttempts: 1,
+            lastAttempt: now,
+            lastCorrect: review.isCorrect,
+            nextReview: this._calculateNextReview(review.isCorrect ? 1 : 0),
+            createdAt: now
+        });
+    },
+
+    /**
+     * Get questions due for review
+     * @param {string} subjectId - Subject identifier
+     * @param {number} limit - Max questions
+     */
+    async getDueReviews(subjectId, limit = 10) {
+        await this.init();
+        const all = await this._getAllByIndex('quiz_reviews', 'subjectId', subjectId);
+        const now = Date.now();
+        return all
+            .filter(r => r.nextReview <= now)
+            .sort((a, b) => a.nextReview - b.nextReview)
+            .slice(0, limit);
+    },
+
+    /**
+     * Get all quiz reviews for a subject
+     */
+    async getAllReviews(subjectId) {
+        await this.init();
+        if (subjectId) {
+            return this._getAllByIndex('quiz_reviews', 'subjectId', subjectId);
+        }
+        // Return all reviews across all subjects
+        return new Promise((resolve, reject) => {
+            const tx = this.db.transaction('quiz_reviews', 'readonly');
+            const store = tx.objectStore('quiz_reviews');
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => reject(request.error);
+        });
+    },
+
+    /**
+     * Calculate next review timestamp based on spaced repetition
+     * Wrong → 1 day, Correct 1x → 3 days, 2x → 7 days, 3x+ → 30 days
+     */
+    _calculateNextReview(correctCount) {
+        const now = Date.now();
+        const DAY = 86400000;
+        if (correctCount <= 0) return now + (1 * DAY);
+        if (correctCount === 1) return now + (3 * DAY);
+        if (correctCount === 2) return now + (7 * DAY);
+        return now + (30 * DAY);
+    },
+
+    /**
+     * Simple string hash for question dedup
+     */
+    _simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return hash;
+    },
+
+    // ============ GLOBAL STATS OPERATIONS ============
+
+    /**
+     * Get a global stat value
+     * @param {string} key - Stat key (e.g. 'streak', 'totalSessions', 'lastStudyDate', 'topicsLearned')
+     * @param {*} defaultValue - Default if not found
+     * @returns {Promise<*>}
+     */
+    async getGlobalStat(key, defaultValue = null) {
+        await this.init();
+        const record = await this._get('global_stats', key);
+        return record?.value ?? defaultValue;
+    },
+
+    /**
+     * Set a global stat value
+     * @param {string} key - Stat key
+     * @param {*} value - Value to store
+     */
+    async setGlobalStat(key, value) {
+        await this.init();
+        return this._put('global_stats', { key, value });
+    },
+
+    /**
+     * Get all global stats as a flat object { streak, totalSessions, ... }
+     * @returns {Promise<Object>}
+     */
+    async getAllGlobalStats() {
+        await this.init();
+        const all = await this._getAll('global_stats');
+        const result = {};
+        for (const record of all) {
+            result[record.key] = record.value;
+        }
+        return result;
+    },
+
+    /**
+     * Increment a numeric global stat by a delta
+     * @param {string} key - Stat key
+     * @param {number} delta - Amount to add (default 1)
+     * @returns {Promise<number>} New value
+     */
+    async incrementGlobalStat(key, delta = 1) {
+        await this.init();
+        const current = await this.getGlobalStat(key, 0);
+        const newValue = current + delta;
+        await this.setGlobalStat(key, newValue);
+        return newValue;
+    },
+
+    /**
+     * Add a topic to the learned topics set (deduplicates)
+     * @param {string} topic - Topic string
+     * @returns {Promise<number>} Total unique topics
+     */
+    async addLearnedTopic(topic) {
+        await this.init();
+        const topics = await this.getGlobalStat('topicsLearned', []);
+        if (!topics.includes(topic)) {
+            topics.push(topic);
+            await this.setGlobalStat('topicsLearned', topics);
+        }
+        return topics.length;
     },
 
     // ============ GENERIC HELPERS ============

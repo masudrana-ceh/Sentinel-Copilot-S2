@@ -42,8 +42,13 @@ export const Dashboard = {
             </div>
 
             <!-- Quick Stats -->
-            <div id="quick-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div id="quick-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <!-- Populated dynamically -->
+            </div>
+
+            <!-- Progress Tracker -->
+            <div id="progress-tracker" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <!-- Streak, Sessions, Topics, Best Streak — populated dynamically -->
             </div>
 
             <!-- Subject Grid -->
@@ -59,10 +64,16 @@ export const Dashboard = {
 
             <!-- Analytics Section -->
             <div class="mb-8">
-                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-bar text-emerald-400"></i>
-                    Study Analytics
-                </h2>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-emerald-400"></i>
+                        Study Analytics
+                    </h2>
+                    <button id="export-report-btn" class="px-4 py-2 bg-gray-800 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors text-sm flex items-center gap-2">
+                        <i class="fas fa-file-pdf text-red-400"></i>
+                        Export Report
+                    </button>
+                </div>
                 <div id="analytics-container">
                     <!-- Charts rendered dynamically -->
                 </div>
@@ -133,10 +144,11 @@ export const Dashboard = {
     async renderAnalytics() {
         const container = document.getElementById('analytics-container');
         const statsContainer = document.getElementById('quick-stats');
+        const progressContainer = document.getElementById('progress-tracker');
         
         if (!container) return;
 
-        // Get summary stats
+        // Get summary stats (now includes global stats)
         const summary = await Analytics.getSummary();
 
         // Render quick stats
@@ -155,8 +167,31 @@ export const Dashboard = {
                     <div class="text-xs text-gray-400">Average Score</div>
                 </div>
                 <div class="glass-effect p-4 rounded-xl text-center">
-                    <div class="text-2xl font-bold text-amber-400">${summary.subjectsActive}/7</div>
+                    <div class="text-2xl font-bold text-amber-400">${summary.subjectsActive}/8</div>
                     <div class="text-xs text-gray-400">Active Subjects</div>
+                </div>
+            `;
+        }
+
+        // Render progress tracker (streak, sessions, topics, best streak)
+        if (progressContainer) {
+            const streakEmoji = summary.currentStreak >= 7 ? '🔥' : summary.currentStreak >= 3 ? '⚡' : '📅';
+            progressContainer.innerHTML = `
+                <div class="glass-effect p-4 rounded-xl text-center border border-orange-500/20">
+                    <div class="text-2xl font-bold text-orange-400">${streakEmoji} ${summary.currentStreak}</div>
+                    <div class="text-xs text-gray-400">Day Streak</div>
+                </div>
+                <div class="glass-effect p-4 rounded-xl text-center border border-cyan-500/20">
+                    <div class="text-2xl font-bold text-cyan-400">${summary.totalSessions}</div>
+                    <div class="text-xs text-gray-400">Total Sessions</div>
+                </div>
+                <div class="glass-effect p-4 rounded-xl text-center border border-pink-500/20">
+                    <div class="text-2xl font-bold text-pink-400">${summary.topicsLearned}</div>
+                    <div class="text-xs text-gray-400">Topics Learned</div>
+                </div>
+                <div class="glass-effect p-4 rounded-xl text-center border border-yellow-500/20">
+                    <div class="text-2xl font-bold text-yellow-400">🏆 ${summary.bestStreak}</div>
+                    <div class="text-xs text-gray-400">Best Streak</div>
                 </div>
             `;
         }
@@ -166,6 +201,13 @@ export const Dashboard = {
     },
 
     setupEventListeners() {
-        // Subject card clicks are handled globally in main.js
+        // Export report button
+        document.getElementById('export-report-btn')?.addEventListener('click', async () => {
+            try {
+                await Analytics.exportStudyReport();
+            } catch (e) {
+                console.error('[Dashboard] Export failed:', e);
+            }
+        });
     }
 };
