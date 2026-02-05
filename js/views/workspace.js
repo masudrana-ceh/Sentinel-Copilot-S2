@@ -165,6 +165,10 @@ export const Workspace = {
                         <input type="checkbox" id="use-rag" checked class="rounded">
                         <span>Use uploaded documents</span>
                     </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="use-streaming" class="rounded">
+                        <span>Stream response</span>
+                    </label>
                     <span class="flex items-center gap-1">
                         <i class="fas fa-lightbulb text-amber-400"></i>
                         ${this.currentSubject.pedagogy} mode
@@ -311,6 +315,7 @@ export const Workspace = {
         const input = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const useRag = document.getElementById('use-rag')?.checked ?? true;
+        const useStreaming = document.getElementById('use-streaming')?.checked ?? false;
 
         const message = input?.value.trim();
         if (!message) return;
@@ -351,27 +356,64 @@ export const Workspace = {
             if (state.isDemo) {
                 await new Promise(r => setTimeout(r, 1500));
                 response = this.getDemoResponse();
-            } else if (state.activeProvider === 'cerebras') {
-                response = await ApiService.Cerebras.call(
-                    message,
-                    state.apiKeys.cerebras,
-                    'chatbot',
-                    state.selectedModel,
-                    prompt.systemPrompt + '\n\n' + prompt.contextBlock
-                );
-            } else if (state.activeProvider === 'gemini') {
-                response = await ApiService.Gemini.call(
-                    message,
-                    state.apiKeys.gemini,
-                    'chatbot',
-                    prompt.systemPrompt + '\n\n' + prompt.contextBlock
-                );
+                this.removeTyping(typingId);
+                this.addMessage(response, 'ai');
+            } else if (useStreaming && state.apiKeys.cerebras) {
+                // Streaming mode
+                this.removeTyping(typingId);
+                const streamId = this.createStreamingMessage();
+                
+                await new Promise((resolve, reject) => {
+                    ApiService.stream(
+                        {
+                            systemPrompt: prompt.systemPrompt + '\n\n' + prompt.contextBlock,
+                            userPrompt: message,
+                            apiKeys: state.apiKeys,
+                            model: state.selectedModel || 'llama-3.3-70b'
+                        },
+                        // onChunk
+                        (chunk) => {
+                            this.appendToStreamingMessage(streamId, chunk);
+                        },
+                        // onComplete
+                        (fullText) => {
+                            response = fullText;
+                            this.finalizeStreamingMessage(streamId);
+                            console.log('[Chat] Streaming complete');
+                            resolve();
+                        },
+                        // onError
+                        (error) => {
+                            this.removeStreamingMessage(streamId);
+                            reject(error);
+                        }
+                    );
+                });
             } else {
-                throw new Error('No API configured. Please add an API key in settings.');
+                // Standard API call with failover and caching
+                const result = await ApiService.call({
+                    systemPrompt: prompt.systemPrompt + '\n\n' + prompt.contextBlock,
+                    userPrompt: message,
+                    apiKeys: state.apiKeys,
+                    model: state.selectedModel || 'llama-3.3-70b',
+                    useCache: true
+                });
+
+                response = result.response;
+
+                // Show provider info and timing
+                const timeMs = Math.round(result.responseTime);
+                const providerLabel = result.cached 
+                    ? '⚡ Cached' 
+                    : result.failover 
+                        ? `🔄 ${result.provider} (failover)`
+                        : `✓ ${result.provider}`;
+                console.log(`[Chat] ${providerLabel} - ${timeMs}ms`);
+                
+                this.removeTyping(typingId);
+                this.addMessage(response, 'ai');
             }
 
-            this.removeTyping(typingId);
-            this.addMessage(response, 'ai');
             AppState.addMessage(this.currentSubject.id, 'assistant', response);
 
         } catch (error) {
@@ -381,6 +423,66 @@ export const Workspace = {
             sendBtn.disabled = false;
             input.focus();
         }
+    },
+
+    // Streaming message helpers
+    createStreamingMessage() {
+        const container = document.getElementById('chat-container');
+        const id = 'stream-' + Date.now();
+        
+        container.insertAdjacentHTML('beforeend', `
+            <div id="${id}" class="flex items-start">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3"
+                     style="background: linear-gradient(135deg, ${this.currentSubject.color}, ${this.currentSubject.color}dd);">
+                    <i class="fas fa-robot text-sm text-white"></i>
+                </div>
+                <div class="chat-bubble-ai max-w-[80%]">
+                    <div class="markdown-content stream-content"></div>
+                    <span class="inline-block w-2 h-4 bg-emerald-400 animate-pulse ml-1"></span>
+                </div>
+            </div>
+        `);
+        
+        container.scrollTop = container.scrollHeight;
+        return id;
+    },
+
+    appendToStreamingMessage(id, chunk) {
+        const msg = document.getElementById(id);
+        if (!msg) return;
+        
+        const content = msg.querySelector('.stream-content');
+        if (content) {
+            content.textContent += chunk;
+        }
+        
+        const container = document.getElementById('chat-container');
+        container.scrollTop = container.scrollHeight;
+    },
+
+    finalizeStreamingMessage(id) {
+        const msg = document.getElementById(id);
+        if (!msg) return;
+        
+        const content = msg.querySelector('.stream-content');
+        const cursor = msg.querySelector('.animate-pulse');
+        
+        // Remove cursor
+        cursor?.remove();
+        
+        // Render markdown
+        if (content && typeof DOM !== 'undefined') {
+            content.innerHTML = DOM.renderMarkdown(content.textContent);
+        }
+        
+        // Syntax highlighting
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    },
+
+    removeStreamingMessage(id) {
+        document.getElementById(id)?.remove();
     },
 
     addMessage(text, type, scroll = true) {
