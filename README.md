@@ -1,8 +1,12 @@
 ﻿<div align="center">
 
-# S2-Sentinel Copilot
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=28&duration=3000&pause=1000&color=00F3FF&center=true&vCenter=true&width=700&lines=S2-Sentinel+Copilot+%F0%9F%9B%A1%EF%B8%8F;Intelligent+AI+Study+Platform;Cybersecurity+%2B+RAG+%2B+24%2B+Tools;11%2C707+Lines+of+Production+Code;Built+From+Scratch+%E2%80%94+No+Templates" alt="Typing SVG" />
 
-### An Intelligent Learning Platform Powered by Advanced AI Architecture
+<br>
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=400&size=18&duration=4000&pause=800&color=00FF9D&center=true&vCenter=true&width=600&lines=An+Intelligent+Learning+Platform;Powered+by+Advanced+AI+Architecture;Where+Cybersecurity+Meets+Engineering" alt="Subtitle" />
+
+<br><br>
 
 **A production-ready solution addressing real-world learning challenges for cybersecurity professionals and students worldwide**
 
@@ -16,13 +20,26 @@
 ![AI](https://img.shields.io/badge/AI-Multi%20Model-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 
+<br>
+
+![Lines](https://img.shields.io/badge/Lines_of_Code-11%2C707-blueviolet?style=flat-square&logo=visual-studio-code&logoColor=white)
+![Files](https://img.shields.io/badge/Modular_Files-46-blue?style=flat-square&logo=files&logoColor=white)
+![Tools](https://img.shields.io/badge/Built--in_Tools-24%2B-orange?style=flat-square&logo=toolbox&logoColor=white)
+![Themes](https://img.shields.io/badge/Themes-12-purple?style=flat-square&logo=palette&logoColor=white)
+![Stars](https://img.shields.io/github/stars/mizazhaider-ceh/Sentinel-Copilot-S2?style=flat-square&logo=github)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=mizazhaider-ceh%2FSentinel-Copilot-S2&label=Visitors&countColor=%2300f3ff)
+
 </div>
 
 ---
 
-## Key Highlights
+## 🎯 Key Highlights
 
-**Technical Excellence**
+<table>
+<tr>
+<td>
+
+**🛠️ Technical Excellence**
 - **11,707 lines** of production code across **46 modular files**
 - **Full-stack architecture**: Vanilla JavaScript SPA + Python FastAPI backend
 - **Hybrid RAG engine**: TF-IDF + ChromaDB vector search + BM25 ranking
@@ -30,7 +47,10 @@
 - **Offline-first PWA**: Service worker with intelligent caching strategies
 - **Multi-model AI**: Abstraction layer supporting Cerebras (1000+ tokens/sec) & Google Gemini
 
-**Engineering Impact**
+</td>
+<td>
+
+**📊 Engineering Impact**
 - Zero external dependencies for core functionality (vanilla JS architecture)
 - Modular component system with clear separation of concerns
 - IndexedDB for client-side persistence with automatic state management
@@ -38,7 +58,11 @@
 - Built-in analytics engine tracking 15+ learning metrics
 - Comprehensive tool suite (24+ utilities) with zero external API dependencies
 
-**Problem-Solution Fit**
+</td>
+</tr>
+</table>
+
+> 🚨 **Problem-Solution Fit**
 
 Identified critical pain points in modern cybersecurity education:
 - **Context Fragmentation**: Students lose valuable information across multiple AI platforms
@@ -50,9 +74,9 @@ Identified critical pain points in modern cybersecurity education:
 
 ---
 
-## Architecture & Features
+## 🏗️ Architecture & Features
 
-### Core Capabilities
+### 🧠 Core Capabilities
 
 **Intelligent Learning System**
 - **Context-Aware AI**: Multi-layer prompt engineering with course-specific knowledge injection
@@ -89,7 +113,7 @@ Identified critical pain points in modern cybersecurity education:
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - Modern web browser (Chrome 90+, Firefox 88+, Safari 14+)
@@ -132,9 +156,9 @@ uvicorn main:app --reload
 
 ---
 
-## Technical Specifications
+## ⚙️ Technical Specifications
 
-### Frontend Architecture
+### 🌐 Frontend Architecture
 - **Framework**: Vanilla JavaScript (zero framework dependencies)
 - **Architecture Pattern**: Single Page Application (SPA) with route-based lazy loading
 - **State Management**: Custom reactive state manager with pub/sub pattern
@@ -142,14 +166,14 @@ uvicorn main:app --reload
 - **UI System**: CSS Grid + Flexbox with custom design tokens
 - **Theme Engine**: CSS custom properties with 12 pre-built themes (Glass, Aurora, Nebula, Cyber, Ocean, Sunset, Forest, Sentinel-Dark, Midnight, Hacker, Light, Lavender)
 
-### Backend Stack (Optional RAG Enhancement)
+### 🐍 Backend Stack (Optional RAG Enhancement)
 - **Framework**: FastAPI (Python 3.9+)
 - **Vector Database**: ChromaDB with persistent storage
 - **Search Algorithm**: Hybrid BM25 + semantic vector search
 - **Document Processing**: PyMuPDF for PDF extraction, semantic chunking
 - **API Design**: RESTful with OpenAPI documentation
 
-### Performance Characteristics
+### ⚡ Performance Characteristics
 - **Initial Load**: < 500ms (without cached resources)
 - **AI Response Time**: 50-200ms first token (Cerebras), streaming thereafter
 - **Vector Search**: < 100ms for 10,000 document chunks
@@ -158,7 +182,13 @@ uvicorn main:app --reload
 
 ---
 
-## The Powerful Combination
+## 🔥 The Powerful Combination
+
+<div align="center">
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3000&pause=1000&color=FF6B6B&center=true&vCenter=true&width=500&lines=6+Domains+%E2%80%94+1+Platform;Where+Cybersecurity+Meets+Engineering" alt="Combo" />
+
+</div>
 
 > **S2-Sentinel isn't just a study tool—it's a convergence of multiple engineering disciplines into one cohesive platform.**
 
@@ -173,14 +203,14 @@ This project represents the intersection of **six distinct technical domains**, 
 
 | Domain | Application in S2-Sentinel | Depth |
 |--------|---------------------------|-------|
-| **Cybersecurity Knowledge** | Pre-built prompts for 8 security domains, attack-chain pedagogy, CTF training tools, pentesting utilities | Deep domain expertise |
-| **AI & RAG Integration** | Hybrid retrieval (TF-IDF + BM25 + ChromaDB vectors), multi-model abstraction (Cerebras + Gemini), streaming SSE, context-aware prompt engineering | Production-grade AI pipeline |
-| **Full-Stack Web Development** | Vanilla JS SPA (zero dependencies), Python FastAPI backend, RESTful APIs, IndexedDB persistence, service worker PWA | End-to-end engineering |
-| **UI/UX Design** | 12-theme design system, glassmorphism aesthetics, responsive 320px–4K, accessibility-first, CSS custom properties architecture | Professional-grade design |
-| **Project Management** | 6-phase development roadmap, semantic versioning, modular architecture planning, feature prioritization | Structured delivery |
-| **Software Engineering Practices** | Clean git history (100+ meaningful commits), modular file architecture (46 files), comprehensive documentation, MIT licensing | Industry-standard workflow |
+| 🔐 **Cybersecurity Knowledge** | Pre-built prompts for 8 security domains, attack-chain pedagogy, CTF training tools, pentesting utilities | Deep domain expertise |
+| 🤖 **AI & RAG Integration** | Hybrid retrieval (TF-IDF + BM25 + ChromaDB vectors), multi-model abstraction (Cerebras + Gemini), streaming SSE, context-aware prompt engineering | Production-grade AI pipeline |
+| 🌐 **Full-Stack Web Development** | Vanilla JS SPA (zero dependencies), Python FastAPI backend, RESTful APIs, IndexedDB persistence, service worker PWA | End-to-end engineering |
+| 🎨 **UI/UX Design** | 12-theme design system, glassmorphism aesthetics, responsive 320px–4K, accessibility-first, CSS custom properties architecture | Professional-grade design |
+| 📋 **Project Management** | 6-phase development roadmap, semantic versioning, modular architecture planning, feature prioritization | Structured delivery |
+| 📦 **Software Engineering Practices** | Clean git history (100+ meaningful commits), modular file architecture (46 files), comprehensive documentation, MIT licensing | Industry-standard workflow |
 
-### Why This Combination Matters
+### 💡 Why This Combination Matters
 
 Most student projects demonstrate **one** skill. S2-Sentinel demonstrates the ability to:
 
@@ -194,7 +224,7 @@ This isn't a tutorial project copied from YouTube. It's an **original system** b
 
 ---
 
-## System Architecture
+## 📌 System Architecture
 
 ```mermaid
 graph TB
@@ -225,9 +255,9 @@ graph TB
 
 ---
 
-## Development Highlights
+## 📈 Development Highlights
 
-### Version 2.0.2 (Current Stable)
+### Version 2.0.2 (Current Stable) ✅
 
 **UI/UX Enhancements**
 - Glassmorphism design system with premium visual aesthetics
@@ -251,9 +281,9 @@ graph TB
 
 ---
 
-## Project Genesis
+## 💫 Project Genesis
 
-### How It Started
+### 💡 How It Started
 
 It began with **[Study Copilot](https://github.com/mizazhaider-ceh/Study-Copilot)**—a personal AI tutor I built to make my own study sessions more productive. It worked. But as Semester 2 at Howest started, I realized the problem was bigger than I thought.
 
@@ -267,7 +297,7 @@ Study Copilot was a good foundation, but Semester 2 needed something **purpose-b
 
 That's when S2-Sentinel Copilot was born.
 
-### The Effort Behind It
+### ❤️ The Effort Behind It
 
 This project took **significant time and dedication**—countless late nights, debugging sessions, architecture rewrites, and feature iterations. From the first line of code to the 11,707th, every decision was intentional.
 
@@ -277,9 +307,9 @@ But more importantly, it was built with a philosophy: **tools should adapt to st
 
 ---
 
-## The Road Ahead
+## 🚀 The Road Ahead
 
-> **S2-Sentinel doesn't stop here.**
+> **S2-Sentinel doesn't stop here.** ♾️
 
 This platform is designed to **evolve**. The modular architecture, clean codebase, and extensible configuration system were built with the future in mind.
 
@@ -287,12 +317,12 @@ This platform is designed to **evolve**. The modular architecture, clean codebas
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| Multi-Semester Support | Expand beyond S2 to cover full degree programs | Planned |
-| Collaborative Learning | Real-time study rooms and shared notes | Researching |
-| Advanced Analytics | ML-powered study pattern optimization | Designed |
-| Mobile Application | React Native companion app | Planned |
-| Institutional API | University-level deployment and LMS integration | Architected |
-| Plugin Marketplace | Community-contributed tools and course packs | Conceptualized |
+| 🏫 Multi-Semester Support | Expand beyond S2 to cover full degree programs | 📌 Planned |
+| 👥 Collaborative Learning | Real-time study rooms and shared notes | 🔍 Researching |
+| 🧠 Advanced Analytics | ML-powered study pattern optimization | ✅ Designed |
+| 📱 Mobile Application | React Native companion app | 📌 Planned |
+| 🏢 Institutional API | University-level deployment and LMS integration | 📐 Architected |
+| 🧩 Plugin Marketplace | Community-contributed tools and course packs | 💡 Conceptualized |
 
 **The vision**: From a single-semester study companion to a **comprehensive learning OS** for cybersecurity professionals worldwide.
 
@@ -300,7 +330,7 @@ Every commit brings it closer. Every user's feedback shapes its direction.
 
 ---
 
-## Documentation
+## 📚 Documentation
 
 | Document | Purpose |
 |----------|----------|
@@ -310,11 +340,11 @@ Every commit brings it closer. Every user's feedback shapes its direction.
 
 ---
 
-## Contributors & Collaboration
+## 🤝 Contributors & Collaboration
 
 <div align="center">
 
-### Core Team
+### 👨‍💻 Core Team
 
 </div>
 
@@ -331,33 +361,37 @@ Every commit brings it closer. Every user's feedback shapes its direction.
 - Tested features and reported issues that led to stability improvements
 - A true collaborator whose perspective helped S2-Sentinel become what it is today
 
-### Our Collaboration
+### 🤜🤛 Our Collaboration
 
 S2-Sentinel was built through genuine collaboration. While I (Izaz) handled the engineering, Masud was the sounding board who challenged ideas, suggested better approaches, and kept the user experience honest. The best features in this platform—the tool selection, the intuitive UI flow, the focus on practical utility—came from our discussions about what **we as students actually needed**, not just what looked impressive technically.
 
 Building something together is always better than building alone.
 
-### Acknowledgments
+### 🙏 Acknowledgments
 
-- **Howest University Belgium** — For the world-class Cybersecurity Engineering program that inspired this project
-- **Cerebras AI** — For providing lightning-fast inference API (1000+ tokens/sec)
-- **Google Gemini** — For powerful AI capabilities as a secondary model
-- **Fellow Students** — Beta testers who provided invaluable feedback during development
-- **Open Source Community** — For the libraries and tools that made this possible
+- 🏫 **Howest University Belgium** — For the world-class Cybersecurity Engineering program that inspired this project
+- ⚡ **Cerebras AI** — For providing lightning-fast inference API (1000+ tokens/sec)
+- 🧠 **Google Gemini** — For powerful AI capabilities as a secondary model
+- 👥 **Fellow Students** — Beta testers who provided invaluable feedback during development
+- 📚 **Open Source Community** — For the libraries and tools that made this possible
 
 ---
 
-## About the Creator
+## 🎓 About the Creator
 
 <div align="center">
 
-**Muhammad Izaz Haider (MIHx0)**
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3000&pause=1000&color=F7DC6F&center=true&vCenter=true&width=500&lines=Muhammad+Izaz+Haider+(MIHx0);Cybersecurity+Student+%40+Howest+Belgium;DevSecOps+%26+AI+Security+Engineer;From+Pakistan+%F0%9F%87%B5%F0%9F%87%B0+to+Belgium+%F0%9F%87%A7%F0%9F%87%AA" alt="Creator" />
 
-Cybersecurity Student @ Howest University Belgium  
+</div>
+
+<div align="center">
+
+Cybersecurity Student @ Howest University Belgium 🇧🇪  
 Junior DevSecOps & AI Security Engineer @ Damno Solutions  
 Founder of The PenTrix
 
-*From a small village in Pakistan to the European tech frontier*
+*From a small village in Pakistan 🇵🇰 to the European tech frontier 🇪🇺*
 
 </div>
 
@@ -369,32 +403,33 @@ Founder of The PenTrix
 
 ---
 
-## Connect
+## 🔗 Connect
 
 <div align="center">
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Muhammad%20Izaz%20Haider-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/muhammad-izaz-haider-091639314/)
 [![GitHub](https://img.shields.io/badge/GitHub-mizazhaider--ceh-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/mizazhaider-ceh)
 [![Portfolio](https://img.shields.io/badge/Portfolio-Visit%20Now-FF6B6B?style=for-the-badge&logo=google-chrome&logoColor=white)](https://mizazhaider-ceh.github.io/My-Portfolio/)
+[![Email](https://img.shields.io/badge/Email-Contact%20Me-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:mizazhaiderceh@gmail.com)
 
 </div>
 
 ---
 
-## Support & Contributing
+## ⭐ Support & Contributing
 
 If S2-Sentinel has been useful to you:
 
-- **Star** this repository to help others discover it
-- **Fork** and submit PRs for improvements or new features
-- **Open issues** for bugs, feature requests, or curriculum suggestions
-- **Share** with fellow cybersecurity students and professionals
+- ⭐ **Star** this repository to help others discover it
+- 🔀 **Fork** and submit PRs for improvements or new features
+- 💬 **Open issues** for bugs, feature requests, or curriculum suggestions
+- 📣 **Share** with fellow cybersecurity students and professionals
 
 Contributions welcome. See [TECHNICAL.md](TECHNICAL.md) for architecture details before contributing.
 
 ---
 
-## License
+## 📜 License
 
 MIT License — Free to use, modify, and distribute.
 
@@ -402,11 +437,17 @@ MIT License — Free to use, modify, and distribute.
 
 <div align="center">
 
-**Built with purpose. Engineered with discipline. Shipped with pride.**
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=24&duration=3000&pause=1000&color=00FF9D&center=true&vCenter=true&width=600&lines=Built+with+purpose.;Engineered+with+discipline.;Shipped+with+pride.+%F0%9F%9A%80" alt="Footer" />
+
+<br>
 
 *From a university problem → To a global solution*
 
-[Get Started](#quick-start) • [Read the Docs](TECHNICAL.md) • [View Architecture](#system-architecture)
+[Get Started](#-quick-start) • [Read the Docs](TECHNICAL.md) • [View Architecture](#-system-architecture)
+
+<br>
+
+![Made with](https://img.shields.io/badge/Made%20with-%F0%9F%92%BB%20%26%20%E2%98%95%20%26%20%F0%9F%9B%A1%EF%B8%8F-red?style=for-the-badge)
 
 </div>
 
