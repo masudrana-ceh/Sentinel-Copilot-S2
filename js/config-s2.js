@@ -7,14 +7,26 @@
 export const BRANDING = {
     appName: "S2-Sentinel Copilot",
     subtitle: "Hyper-Intelligent AI for CS Engineering Semester 2",
-    version: "1.0.0",
+    version: "1.7.0",
     creator: {
         name: "Muhammad Izaz Haider",
         alias: "MIHx0",
         role: "Junior DevSecOps & AI Security Engineer",
         company: "Damno Solutions",
         education: "Cybersecurity Student @ Howest University 🇧🇪",
-        founder: "The PenTrix"
+        founder: "The PenTrix",
+        avatar: "https://avatars.githubusercontent.com/u/93000000?v=4", // Placeholder
+        skills: ["Python", "JavaScript", "AI/ML", "Cybersecurity", "DevSecOps", "Web Development", "Pentesting", "Cloud Security"],
+        params: {
+            passion: "Building AI-powered security tools",
+            focus: "Ethical Hacking & Secure Code Review",
+            vision: "Democratizing cybersecurity education"
+        }
+    },
+    project: {
+        description: "A hyper-intelligent AI study platform designed specifically for Computer Science Engineering Semester 2 students at Howest University Belgium. Combines RAG technology, advanced AI models, and specialized security toolkits to provide personalized learning experiences.",
+        mission: "Transform complex CS concepts into digestible knowledge through AI-powered teaching, while maintaining the highest standards of security and code quality.",
+        whyBuilt: "As a cybersecurity student, I noticed the gap between theoretical coursework and practical application. This platform bridges that gap by providing context-aware AI assistance, security-first toolkits, and real-time analytics to help students master their subjects efficiently and securely."
     }
 };
 

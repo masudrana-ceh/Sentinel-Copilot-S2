@@ -140,3 +140,86 @@ pre[class*="language-"] {
     border-color: rgba(239, 68, 68, 0.3);
     color: #fca5a5;
 }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.5);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.7);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* History Specific Styles */
+#history-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(16, 185, 129, 0.5) rgba(0, 0, 0, 0.2);
+}
+
+#history-modal .modal-content,
+#conversation-detail-modal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.conversation-card {
+    transition: all 0.2s ease;
+}
+
+.conversation-card:hover {
+    transform: translateX(4px);
+}
+
+/* Welcome Screen */
+.welcome-screen {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Footer Styles */
+footer a {
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--color-accent);
+}
+
+.social-icon {
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+    color: var(--color-accent);
+}

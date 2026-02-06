@@ -8,6 +8,8 @@ import { BRANDING, SUBJECTS, CONSTANTS } from './config-s2.js';
 import { AppState } from './state-manager.js';
 import { StorageIDB } from './services/storage-idb.js';
 import { Analytics } from './features/analytics.js';
+import { History } from './features/history.js';
+import { Welcome } from './features/welcome.js';
 import { RAGEngine } from './features/rag-engine.js';
 import { Dashboard } from './views/dashboard.js';
 import { Workspace } from './views/workspace.js';
@@ -100,6 +102,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         await Analytics.init();
         console.log('[Init] Analytics ready');
 
+        console.log('[Init] Starting History...');
+        await History.init();
+        console.log('[Init] History ready');
+
         console.log('[Init] Starting ThemeManager...');
         ThemeManager.init();
         console.log('[Init] ThemeManager ready');
@@ -123,6 +129,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Check API configuration
         checkApiConfiguration();
+
+        // Setup About modal content
+        setupAbout();
+
+        // Show welcome screen if first visit
+        Welcome.show();
 
         // Handle initial route - use a small delay to ensure DOM is fully ready
         // This prevents race conditions with hashchange events
@@ -322,6 +334,32 @@ function setupGlobalListeners() {
         }
     });
 
+    // About button
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#about-btn') || e.target.closest('#footer-about-btn')) {
+            document.getElementById('about-modal')?.showModal();
+        }
+    });
+
+    // About modal close button
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-about]')) {
+            document.getElementById('about-modal')?.close();
+        }
+    });
+
+    // Footer buttons
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#footer-history-btn')) {
+            History.showHistoryModal();
+        }
+        if (e.target.closest('#footer-settings-btn')) {
+            Modal.toggle('settings-modal', true);
+            const pickerContainer = document.getElementById('theme-picker-container');
+            if (pickerContainer) ThemeManager.renderPicker(pickerContainer);
+        }
+    });
+
     // API modal save
     document.addEventListener('click', async (e) => {
         if (e.target.closest('#save-api-keys')) {
@@ -430,6 +468,114 @@ async function saveApiKeys() {
             saveBtn.innerHTML = '<i class="fas fa-plug"></i> Connect';
         }
     }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ABOUT MODAL SETUP
+// ═══════════════════════════════════════════════════════════════
+
+function setupAbout() {
+    const aboutContent = document.getElementById('about-content');
+    if (!aboutContent) return;
+
+    const { creator, project, appName, version } = BRANDING;
+
+    aboutContent.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <!-- Left Column: Creator Profile -->
+            <div class="md:col-span-5 text-center md:text-left border-b md:border-b-0 md:border-r border-white/10 pb-6 md:pb-0 md:pr-6">
+                <div class="relative w-32 h-32 mx-auto md:mx-0 mb-6 group">
+                    <div class="absolute inset-0 bg-emerald-500 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                    <div class="relative w-full h-full rounded-full border-4 border-gray-800 shadow-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-user text-white text-5xl"></i>
+                    </div>
+                    <span class="absolute bottom-0 right-0 bg-emerald-500 text-black text-xs font-bold px-2 py-1 rounded-full border border-black shadow-lg">
+                        ${creator.alias}
+                    </span>
+                </div>
+
+                <h2 class="text-3xl font-bold text-white mb-1">${creator.name}</h2>
+                <p class="text-emerald-400 font-medium mb-4">${creator.role}</p>
+                
+                <div class="space-y-3 text-sm text-white/80 mb-6">
+                    <div class="flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-briefcase text-emerald-500/80"></i>
+                        <span>${creator.company}</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-university text-emerald-500/80"></i>
+                        <span>${creator.education}</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start gap-2">
+                        <i class="fas fa-building text-emerald-500/80"></i>
+                        <span>Founder: ${creator.founder}</span>
+                    </div>
+                    ${Object.entries(creator.params).map(([key, val]) => `
+                        <div class="flex items-center justify-center md:justify-start gap-2">
+                            <i class="fas fa-star text-emerald-500/80"></i>
+                            <span>${val}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="flex flex-wrap justify-center md:justify-start gap-2">
+                    ${creator.skills.map(skill => `
+                        <span class="px-2 py-1 bg-white/5 border border-white/10 rounded-md text-xs text-emerald-300">
+                            ${skill}
+                        </span>
+                    `).join('')}
+                </div>
+
+                <div class="mt-6 flex justify-center md:justify-start gap-3">
+                    <a href="https://github.com/MIHx0" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800/50 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-emerald-400 transition-all">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/muhammadizazhaider" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800/50 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-emerald-400 transition-all">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="https://thepentrix.com" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-lg bg-gray-800/50 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-emerald-400 transition-all">
+                        <i class="fas fa-globe text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column: Project Info -->
+            <div class="md:col-span-7 flex flex-col justify-center">
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <figure class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center" aria-hidden="true">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 2L3 7v6l7 5 7-5V7l-7-5zm0 2.236L14.09 7.5 10 10.764 5.91 7.5 10 4.236z" clip-rule="evenodd"/>
+                            </svg>
+                        </figure>
+                        <h3 class="text-2xl font-bold text-white">${appName} <span class="text-white/30 text-sm font-normal ml-2">v${version}</span></h3>
+                    </div>
+                    
+                    <p class="text-white/90 text-lg leading-relaxed mb-6">
+                        ${project.description}
+                    </p>
+
+                    <div class="bg-white/5 rounded-xl p-5 border border-white/10 mb-6">
+                        <h4 class="text-emerald-400 font-bold mb-2 uppercase text-xs tracking-wider flex items-center gap-2">
+                            <i class="fas fa-bullseye"></i> Mission
+                        </h4>
+                        <p class="text-white/80 italic">"${project.mission}"</p>
+                    </div>
+
+                    <div class="bg-emerald-500/10 rounded-xl p-5 border border-emerald-500/20">
+                        <h4 class="text-emerald-400 font-bold mb-2 uppercase text-xs tracking-wider flex items-center gap-2">
+                            <i class="fas fa-lightbulb"></i> Why I Built This
+                        </h4>
+                        <p class="text-white/80 text-sm">${project.whyBuilt}</p>
+                    </div>
+                </div>
+
+                <div class="mt-auto text-right">
+                    <p class="text-white/20 text-xs font-mono">Designed & Developed with <span class="text-red-400">❤</span> by MIHx0</p>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function updateApiStatusDisplay() {

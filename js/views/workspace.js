@@ -7,6 +7,7 @@
 import { SUBJECTS } from '../config-s2.js';
 import { AppState } from '../state-manager.js';
 import { Analytics } from '../features/analytics.js';
+import { History } from '../features/history.js';
 import { PromptBuilder } from '../features/prompt-builder.js';
 
 // Sub-module mixins
@@ -47,7 +48,69 @@ export const Workspace = {
         // Show greeting
         this.addMessage(PromptBuilder.getGreeting(subjectId), 'ai');
         
+        // Setup continue chat listener
+        this.setupContinueChatListener();
+        
         console.log('[Workspace] Render complete');
+    },
+
+    /**
+     * Setup listener for loading chat sessions from history
+     */
+    setupContinueChatListener() {
+        // Remove old listener if exists
+        if (this._loadChatHandler) {
+            window.removeEventListener('load-chat-session', this._loadChatHandler);
+        }
+        
+        // Create new handler
+        this._loadChatHandler = async (event) => {
+            const { conversationId, messages } = event.detail;
+            
+            if (!messages || !Array.isArray(messages) || messages.length === 0 || !this.currentSubject) {
+                console.warn('[Workspace] Invalid conversation data:', event.detail);
+                return;
+            }
+            
+            console.log('[Workspace] Loading conversation:', conversationId, 'with', messages.length, 'messages');
+            
+            // Set active conversation in History FIRST
+            History.activeConversations[this.currentSubject.id] = conversationId;
+            
+            // Prepare messages for AppState (convert format)
+            const stateMessages = messages.map(msg => ({
+                role: msg.type === 'user' ? 'user' : 'assistant',
+                content: msg.message,
+                timestamp: msg.timestamp
+            }));
+            
+            // Update AppState conversationHistory properly
+            const currentHistory = AppState.getState().conversationHistory || {};
+            AppState.setState({
+                conversationHistory: {
+                    ...currentHistory,
+                    [this.currentSubject.id]: stateMessages
+                }
+            });
+            
+            console.log('[Workspace] State updated with', stateMessages.length, 'messages for subject:', this.currentSubject.id);
+            
+            // Switch to chat tab - this will render with messages from state
+            this.renderTab('chat');
+            
+            // Scroll to bottom after a short delay to ensure rendering is complete
+            setTimeout(() => {
+                const container = document.getElementById('chat-container');
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 100);
+            
+            console.log('[Workspace] ✅ Conversation loaded successfully');
+        };
+        
+        // Add event listener
+        window.addEventListener('load-chat-session', this._loadChatHandler);
     },
 
     /**
@@ -57,12 +120,54 @@ export const Workspace = {
         // End analytics session without awaiting (called synchronously from router)
         Analytics.endSession().catch(err => console.warn('[Workspace] Cleanup error:', err));
         
+        // Start new conversation when leaving workspace
+        if (this.currentSubject) {
+            History.startNewConversation(this.currentSubject.id);
+        }
+        
+        // Remove continue chat event listener
+        if (this._loadChatHandler) {
+            window.removeEventListener('load-chat-session', this._loadChatHandler);
+            this._loadChatHandler = null;
+        }
+        
         // Clear state
         this.currentSubject = null;
         this.toolContext = null;
         this.lastToolResult = null;
         
         console.log('[Workspace] Destroyed and cleaned up');
+    },
+
+    /**
+     * Start a new chat conversation
+     */
+    startNewChat() {
+        if (!this.currentSubject) return;
+
+        // Confirm if there are messages
+        const chatContainer = document.getElementById('chat-container');
+        if (chatContainer && chatContainer.children.length > 1) {
+            if (!confirm('Start a new conversation? Current chat will be saved to history.')) {
+                return;
+            }
+        }
+
+        // Clear chat UI
+        if (chatContainer) {
+            chatContainer.innerHTML = '';
+        }
+
+        // Clear app state messages using proper AppState method
+        AppState.clearHistory(this.currentSubject.id);
+
+        // Start new conversation in history
+        History.startNewConversation(this.currentSubject.id);
+
+        // Show greeting
+        this.addMessage(PromptBuilder.getGreeting(this.currentSubject.id), 'ai');
+
+        console.log('[Workspace] New chat started for:', this.currentSubject.id);
     },
 
     getTemplate() {
@@ -188,6 +293,13 @@ export const Workspace = {
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.id === 'chat-input') {
                 this.sendMessage();
+            }
+        });
+
+        // New chat button
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#new-chat-btn')) {
+                this.startNewChat();
             }
         });
 

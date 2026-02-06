@@ -3,10 +3,10 @@
 > **Hyper-Intelligent AI Study Platform for CS Engineering Semester 2**  
 > Built specifically for Howest University Belgium
 
-![Version](https://img.shields.io/badge/version-1.6.1-emerald)
-![Phase](https://img.shields.io/badge/phase-6%2F6%20%2B%20bugfix-brightgreen)
+![Version](https://img.shields.io/badge/version-2.0.0-emerald)
+![Phase](https://img.shields.io/badge/phase-6%2F6%20%2B%20features-brightgreen)
 ![Courses](https://img.shields.io/badge/courses-8-purple)
-![Lines](https://img.shields.io/badge/lines-11.5k%2B-blue)
+![Lines](https://img.shields.io/badge/lines-12.5k%2B-blue)
 ![AI](https://img.shields.io/badge/AI-Cerebras%20%7C%20Gemini-orange)
 
 ---
@@ -145,6 +145,75 @@ Ask questions, use tools, take quizzes, track your progress
 - [x] Session save hardened — try/catch in `endSession()`, double-save prevention
 - [x] Export button deduplication — clone-and-replace prevents listener stacking
 
+### Feature Enhancement Round (v1.7.0) ✅
+
+**Phase: Chat History - Basic Implementation**
+
+- [x] **Chat History UI System** — Complete conversation management
+  - Time-based filters (all/today/week/month) + multi-subject filtering
+  - Conversation preview cards with auto-generated titles
+  - Detail modal with continue chat functionality
+  - Search functionality & bulk clear operations
+  - IndexedDB integration with conversations store
+  - Automatic conversation capture & splitting
+  - Enhanced error handling and toast notifications
+
+### Major Architecture Update (v2.0.0) ✅
+
+**Phase: Modular History System + Critical Bug Fixes**
+
+- [x] **History Modular Refactor** — From monolithic to specialized components
+  - **Before**: Single 981-line history.js
+  - **After**: 5-file architecture (1,386 total lines, better organized)
+    - `history.js` (370 lines) - Main orchestrator
+    - `history/storage.js` (148 lines) - All IndexedDB operations
+    - `history/ui.js` (294 lines) - Pure DOM rendering
+    - `history/export.js` (390 lines) - Multi-format export handlers
+    - `history/utils.js` (187 lines) - Reusable helpers
+  - **Export System**: JSON, HTML (styled), PDF (print-optimized)
+  - Export dropdown with format selection
+  - Professionally styled HTML/PDF with markdown rendering
+  - Clear separation of concerns (storage, UI, export, utils)
+
+- [x] **Critical Bug Fixes**
+  - **Bug #1 - Missing Database Methods**: Added 3 missing methods to storage-idb.js
+    - `getAllConversations()` - fetch all conversations
+    - `deleteConversation(id)` - delete by ID  
+    - `clearConversations()` - bulk clear
+    - Updated `saveConversation()` to handle both object and legacy formats
+  - **Bug #2 - UI Crashes on Invalid Data**: Added defensive checks in ui.js
+    - Filter conversations with empty/null messages arrays
+    - Validate data before rendering (prevents `TypeError: Cannot read properties of undefined`)
+    - Show error UI for corrupted conversations
+  - **Bug #3 - Continue Chat Not Working**: Fixed message format mismatch
+    - **Root Cause**: History storage used `{message, type}` but AppState expected `{content, role}`
+    - **Solution**: Added format conversion in workspace.js setupContinueChatListener()
+    - Maps `type` → `role` and `message` → `content` when loading conversations
+    - Fixed state management to use proper `conversationHistory[subjectId]` structure
+    - Old conversations now load correctly and can be continued seamlessly
+
+- [x] **About Modal** — Creator profile showcase
+  - Professional bio layout with skills & education
+  - Project mission statement & "Why I Built This" section
+  - Social media links (GitHub, LinkedIn, Website)
+  - Animated avatar with glow effects
+
+- [x] **Professional Footer** — Site-wide branding & navigation
+  - 4-column layout (Brand, Features, Resources, Company)
+  - Social icon links with hover animations
+  - Quick access to modals & dashboard
+  - Copyright & attribution
+
+- [x] **Welcome Screen** — First-time user onboarding
+  - Feature highlights: 8 subjects, AI models, 40+ tools, analytics
+  - Animated brain icon with pulse effect
+  - Dismissible with localStorage persistence
+  - Clean fade-out animation
+
+- [x] **Enhanced Theme Grid** — Visual previews already implemented
+  - All 12 themes display gradient backgrounds
+  - Active state indicators & hover transitions
+
 ---
 
 ## 📊 Codebase Stats
@@ -189,6 +258,12 @@ S2-Sentinel-Copilot/
 │   │   ├── prompt-builder.js   # 5-layer prompt assembly
 │   │   ├── rag-engine.js       # TF-IDF + ChromaDB hybrid
 │   │   ├── analytics.js        # Study tracking & charts
+│   │   ├── history.js          # Chat history orchestrator (v2.0 Modular)
+│   │   ├── history/            # Modular history components
+│   │   │   ├── storage.js      # Database operations & IndexedDB
+│   │   │   ├── ui.js           # DOM rendering & visual components
+│   │   │   ├── export.js       # Multi-format export (JSON/HTML/PDF)
+│   │   │   └── utils.js        # Helper functions & formatting
 │   │   ├── toolkit.js          # Tool orchestrator (imports 7 modules)
 │   │   └── tools/
 │   │       ├── networks.js     # Subnet calc, port lookup, etc.

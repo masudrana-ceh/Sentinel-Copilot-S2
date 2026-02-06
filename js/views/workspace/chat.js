@@ -9,6 +9,7 @@ import { PromptBuilder } from '../../features/prompt-builder.js';
 import { RAGEngine } from '../../features/rag-engine.js';
 import { WebSearch } from '../../services/web-search.js';
 import { Analytics } from '../../features/analytics.js';
+import { History } from '../../features/history.js';
 import { DOM } from '../../ui/dom.js';
 
 /**
@@ -19,6 +20,19 @@ export const ChatMixin = {
 
     renderChatTab(container) {
         container.innerHTML = `
+            <!-- Chat Header Actions -->
+            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-700/30">
+                <span class="text-xs text-gray-400">
+                    <i class="fas fa-comments mr-1"></i>
+                    Current conversation
+                </span>
+                <button id="new-chat-btn"
+                        class="text-xs px-3 py-1.5 glass-effect text-emerald-400 rounded-lg hover:bg-emerald-500/20 transition-all border border-emerald-400/30 flex items-center gap-1">
+                    <i class="fas fa-plus"></i>
+                    <span>New Chat</span>
+                </button>
+            </div>
+
             <!-- Chat Messages -->
             <div id="chat-container" class="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
                 <!-- Messages rendered here -->
@@ -85,6 +99,10 @@ export const ChatMixin = {
         // User message
         this.addMessage(message, 'user');
         AppState.addMessage(this.currentSubject.id, 'user', message);
+        
+        // Save to history
+        await History.saveMessage(this.currentSubject.id, message, 'user');
+        
         input.value = '';
         sendBtn.disabled = true;
 
@@ -198,6 +216,9 @@ export const ChatMixin = {
             }
 
             AppState.addMessage(this.currentSubject.id, 'assistant', response);
+            
+            // Save AI response to history
+            await History.saveMessage(this.currentSubject.id, response, 'assistant');
 
         } catch (error) {
             this.removeTyping(typingId);

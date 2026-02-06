@@ -371,17 +371,34 @@ export const StorageIDB = {
     // ============ CONVERSATION OPERATIONS ============
 
     /**
-     * Save a conversation session
+     * Save a conversation session (legacy method)
      * @param {string} subjectId - Subject identifier
      * @param {Array} messages - Array of message objects
      */
     async saveConversation(subjectId, messages) {
         await this.init();
-        return this._add('conversations', {
-            subjectId,
-            messages,
-            timestamp: Date.now()
-        });
+        // Check if first parameter is an object (new format) or string (legacy)
+        if (typeof subjectId === 'object' && subjectId !== null) {
+            // New format: full conversation object
+            const conversation = subjectId;
+            return this._put('conversations', conversation);
+        } else {
+            // Legacy format: subjectId + messages
+            return this._add('conversations', {
+                subjectId,
+                messages,
+                timestamp: Date.now()
+            });
+        }
+    },
+
+    /**
+     * Get all conversations across all subjects
+     * @returns {Promise<Array>} All conversations
+     */
+    async getAllConversations() {
+        await this.init();
+        return this._getAll('conversations');
     },
 
     /**
@@ -393,6 +410,28 @@ export const StorageIDB = {
         await this.init();
         const all = await this._getAllByIndex('conversations', 'subjectId', subjectId);
         return all.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
+    },
+
+    /**
+     * Delete a specific conversation
+     * @param {string|number} conversationId - Conversation ID
+     */
+    async deleteConversation(conversationId) {
+        await this.init();
+        return this._delete('conversations', conversationId);
+    },
+
+    /**
+     * Clear all conversations
+     */
+    async clearConversations() {
+        await this.init();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('conversations', 'readwrite');
+            const request = tx.objectStore('conversations').clear();
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
     },
 
     // ============ SETTINGS OPERATIONS ============
