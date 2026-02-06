@@ -5,7 +5,11 @@
  * Falls back to Wikipedia API (CORS-friendly) if backend is offline
  */
 
-const BACKEND_SEARCH_URL = 'http://localhost:8765/api/search';
+// Auto-detect: Docker/nginx proxy (/api) vs local dev (localhost:8765)
+const BACKEND_BASE = (window.location.protocol !== 'file:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+    ? '/api'
+    : 'http://localhost:8765';
+const BACKEND_SEARCH_URL = `${BACKEND_BASE}/api/search`;
 
 export const WebSearch = {
 

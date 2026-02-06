@@ -263,7 +263,11 @@ const SemanticChunker = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const PythonBackend = {
-    baseUrl: 'http://localhost:8765',
+    // Auto-detect: if served from a real web server (not file://), use same-origin /api proxy
+    // Otherwise fall back to direct localhost:8765 for local development
+    baseUrl: (window.location.protocol !== 'file:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+        ? '/api'
+        : 'http://localhost:8765',
     isAvailable: false,
     lastCheck: 0,
     checkInterval: 30000, // 30 seconds

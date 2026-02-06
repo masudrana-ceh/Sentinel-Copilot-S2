@@ -1,0 +1,46 @@
+# ══════════════════════════════════════════
+# S2-Sentinel Copilot — Docker Ignore
+# ══════════════════════════════════════════
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+server/venv/
+server/.venv/
+server/data/
+server/logs/
+
+# Node (if ever present)
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Build artifacts
+*.bak
+*.tmp
+*.temp
+.cache/
+
+# Docs & backups (not needed in container)
+README-old-backup.md
+README-emoji-backup.md
+TECHNICAL.md
+docs/
+
+# Environment files (secrets — inject at runtime)
+.env
+.env.*

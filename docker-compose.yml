@@ -1,0 +1,86 @@
+# ══════════════════════════════════════════════════════════════
+# S2-Sentinel Copilot — Docker Compose
+# Full-stack: Nginx frontend + FastAPI RAG backend
+# ══════════════════════════════════════════════════════════════
+#
+# Quick Start:
+#   docker compose up -d --build
+#
+# Access:
+#   Frontend  → http://localhost:3000
+#   Backend   → http://localhost:3000/api/health  (proxied)
+#   Backend   → http://localhost:8765/health      (direct)
+#
+# Stop:
+#   docker compose down
+#
+# Reset vector DB:
+#   docker compose down -v
+# ══════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Frontend (Nginx static SPA) ──
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: sentinel-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - sentinel-net
+
+  # ── Backend (FastAPI RAG Server) ──
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: sentinel-backend
+    ports:
+      - "${BACKEND_PORT:-8765}:8765"
+    environment:
+      - S2_DEBUG=${S2_DEBUG:-false}
+      - S2_ENVIRONMENT=${S2_ENVIRONMENT:-production}
+      - S2_HOST=0.0.0.0
+      - S2_PORT=8765
+      - S2_CHROMA_DB_PATH=/app/data/chromadb
+      - S2_LOG_FILE=/app/logs/sentinel.log
+      - S2_EMBEDDING_MODEL=${S2_EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+      - S2_CHUNK_SIZE=${S2_CHUNK_SIZE:-600}
+      - S2_CHUNK_OVERLAP=${S2_CHUNK_OVERLAP:-80}
+      # CORS — allow the frontend container + localhost dev
+      - S2_CORS_ORIGINS=["http://localhost:3000","http://frontend","http://localhost:5500","http://127.0.0.1:5500","null"]
+    volumes:
+      # Persist vector DB and logs across container restarts
+      - sentinel-chromadb:/app/data/chromadb
+      - sentinel-logs:/app/logs
+      # Optional: mount model cache so re-downloads are avoided
+      - sentinel-models:/home/sentinel/.cache
+    restart: unless-stopped
+    networks:
+      - sentinel-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; r = httpx.get('http://localhost:8765/health'); r.raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 3
+
+# ── Named Volumes ──
+volumes:
+  sentinel-chromadb:
+    driver: local
+  sentinel-logs:
+    driver: local
+  sentinel-models:
+    driver: local
+
+# ── Network ──
+networks:
+  sentinel-net:
+    driver: bridge
