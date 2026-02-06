@@ -4,8 +4,9 @@
 
 ### *Your AI-Powered Study Companion for Cybersecurity Excellence*
 
-**Built for Howest University Belgium 🇧🇪 • CS Engineering Semester 2**
-**🏆 Battle-Tested by Howest Students • Trusted for Exam Preparation • Proven Results**
+**🎯 A Solution to Real Learning Challenges • Built for Cybersecurity Learners Worldwide 🌍**
+
+*Originally crafted for Howest University Belgium 🇧🇪 CS Engineering Semester 2*
 <br>
 
 ![Version](https://img.shields.io/badge/version-2.0.2-emerald?style=for-the-badge)
@@ -248,15 +249,16 @@ A **unified platform** purpose-built for Howest Cybersecurity Engineering Semest
 - 📈 **Track Progress**: See exactly how much you've studied
 - 🎨 **Beautiful UX**: Actually enjoyable to use
 
-**🌍 Built for Scale**
+**🌍 Built for Everyone**
 
-While designed for Howest Semester 2, the architecture is scalable:
-- ✅ Add any university courses
-- ✅ Support multiple semesters
-- ✅ Customize for different programs
+While originally designed for Howest Semester 2, S2-Sentinel works for **any cybersecurity learner**:
+- ✅ Upload your own course materials (PDFs, notes, slides)
+- ✅ Works with any cybersecurity curriculum
+- ✅ Adaptable to your learning style and pace
+- ✅ Universal tools (subnet calc, JWT decoder, regex tester, etc.)
 - ✅ Multi-language support ready
 
-**From a personal study tool → A complete learning platform** 🚀
+**From a university project → A solution for all cybersecurity learners worldwide** 🌍🚀
 
 ---
 
