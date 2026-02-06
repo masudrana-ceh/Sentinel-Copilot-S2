@@ -77,7 +77,20 @@ class StateManager {
         this.subscribers.get(key).add(callback);
 
         // Return unsubscribe function
-        return () => this.subscribers.get(key).delete(callback);
+        return () => this.subscribers.get(key)?.delete(callback);
+    }
+
+    /**
+     * Remove all subscribers for a given key, or all subscribers if no key provided.
+     * Useful for cleanup on view unmount to prevent memory leaks.
+     * @param {string} [key] - Optional state key. If omitted, clears all subscribers.
+     */
+    unsubscribeAll(key) {
+        if (key) {
+            this.subscribers.delete(key);
+        } else {
+            this.subscribers.clear();
+        }
     }
 
     /**

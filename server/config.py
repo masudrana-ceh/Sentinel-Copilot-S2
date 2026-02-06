@@ -22,7 +22,8 @@ class Settings(BaseSettings):
     # Server Configuration
     host: str = Field(default="0.0.0.0", description="Server host")
     port: int = Field(default=8765, description="Server port")
-    debug: bool = Field(default=False, description="Enable debug mode")
+    debug: bool = Field(default=False, description="Enable debug mode (set S2_DEBUG=true in .env for development)")
+    environment: str = Field(default="production", description="Runtime environment: 'development' or 'production'")
     version: str = "1.0.0"
     
     # CORS Configuration

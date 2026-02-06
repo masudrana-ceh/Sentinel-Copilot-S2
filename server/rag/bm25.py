@@ -51,6 +51,11 @@ class BM25Index:
 
     def add_document(self, doc_id: str, text: str, metadata: Dict = None):
         """Add a document to the BM25 index."""
+        if not isinstance(text, str) or not text.strip():
+            return
+        if not isinstance(doc_id, str) or not doc_id.strip():
+            return
+
         tokens = self._tokenize(text)
         self.doc_texts[doc_id] = text
         self.doc_metadata[doc_id] = metadata or {}

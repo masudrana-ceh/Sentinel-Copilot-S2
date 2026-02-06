@@ -66,7 +66,7 @@ class VectorStore:
             path=self.persist_directory,
             settings=ChromaSettings(
                 anonymized_telemetry=False,
-                allow_reset=True
+                allow_reset=False
             )
         )
         logger.info(f"ChromaDB initialized at: {self.persist_directory}")

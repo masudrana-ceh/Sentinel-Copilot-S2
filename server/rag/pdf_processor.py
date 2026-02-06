@@ -44,40 +44,42 @@ class PDFProcessor:
                             text = span["text"].strip()
                             if text and len(text) > 2:
                                 headers.append((text, font_size))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug(f"Header detection failed for page: {e}")
         return headers
 
     def extract_text(self, pdf_content: bytes) -> Dict[int, str]:
         """Extract text from PDF with enhanced processing."""
+        if not isinstance(pdf_content, bytes):
+            raise TypeError(f"Expected bytes for pdf_content, got {type(pdf_content).__name__}")
+
         pages = {}
 
         try:
-            doc = fitz.open(stream=pdf_content, filetype="pdf")
+            with fitz.open(stream=pdf_content, filetype="pdf") as doc:
+                for page_num in range(len(doc)):
+                    page = doc[page_num]
+                    text = page.get_text("text", sort=True)
 
-            for page_num in range(len(doc)):
-                page = doc[page_num]
-                text = page.get_text("text", sort=True)
+                    # Detect PDF-native headers and insert markdown markers
+                    try:
+                        pdf_headers = self._detect_pdf_headers(page)
+                        for header_text, font_size in pdf_headers:
+                            level = "##" if font_size > 16 else "###"
+                            text = text.replace(header_text, f"\n{level} {header_text}\n", 1)
+                    except Exception as e:
+                        logger.debug(f"Header injection failed on page {page_num + 1}: {e}")
 
-                # Detect PDF-native headers and insert markdown markers
-                try:
-                    pdf_headers = self._detect_pdf_headers(page)
-                    for header_text, font_size in pdf_headers:
-                        level = "##" if font_size > 16 else "###"
-                        text = text.replace(header_text, f"\n{level} {header_text}\n", 1)
-                except Exception:
-                    pass
+                    # Clean up
+                    text = re.sub(r'\n{4,}', '\n\n\n', text)
+                    text = re.sub(r' {3,}', '  ', text)
+                    text = re.sub(r'(\w)-\n(\w)', r'\1\2', text)  # Fix hyphenated line breaks
 
-                # Clean up
-                text = re.sub(r'\n{4,}', '\n\n\n', text)
-                text = re.sub(r' {3,}', '  ', text)
-                text = re.sub(r'(\w)-\n(\w)', r'\1\2', text)  # Fix hyphenated line breaks
+                    if text.strip():
+                        pages[page_num + 1] = text.strip()
 
-                if text.strip():
-                    pages[page_num + 1] = text.strip()
-
-            doc.close()
-
+        except ValueError:
+            raise
         except Exception as e:
             logger.error(f"PDF extraction failed: {e}")
             raise ValueError(f"Failed to extract PDF text: {e}")
@@ -97,6 +99,10 @@ class PDFProcessor:
         for page_num, page_text in pages.items():
             total_chars += len(page_text)
             chunks = self.chunker.chunk_text(page_text, page_num, filename)
+
+            if not chunks:
+                logger.debug(f\"No chunks produced for page {page_num} of {filename}\")
+                continue
 
             for chunk in chunks:
                 if chunk.header:

@@ -309,7 +309,7 @@ export const ChatMixin = {
             ? 'chat-bubble-user'
             : `chat-bubble-ai ${isError ? 'error' : ''}`;
 
-        const content = isUser ? text : (typeof DOM !== 'undefined' ? DOM.renderMarkdown(text) : text);
+        const content = isUser ? DOM.sanitizeHTML(text) : (typeof DOM !== 'undefined' ? DOM.renderMarkdown(text) : text);
 
         const html = `
             <div class="flex items-start ${isUser ? 'justify-end' : ''}">

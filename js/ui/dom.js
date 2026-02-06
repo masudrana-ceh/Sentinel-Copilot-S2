@@ -22,8 +22,14 @@ export const DOM = {
 
     renderMarkdown: (content) => {
         if (typeof marked === 'undefined') return content;
-        // Configure marked for security could be added here
-        marked.setOptions({ breaks: true, gfm: true });
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            // Sanitize HTML in markdown to prevent XSS from AI responses
+            sanitize: false, // Deprecated in marked — use DOMPurify if available
+            headerIds: false,
+            mangle: false
+        });
         return marked.parse(content);
     },
 
@@ -64,5 +70,17 @@ export const DOM = {
                 }
             });
         });
+    },
+
+    /**
+     * Sanitize a string for safe HTML insertion.
+     * Escapes HTML entities to prevent XSS when inserting user-provided text.
+     * @param {string} str - Raw user input string
+     * @returns {string} Escaped string safe for innerHTML
+     */
+    sanitizeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 };

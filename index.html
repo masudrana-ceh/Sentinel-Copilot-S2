@@ -34,21 +34,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <!-- Prism.js - Autoloader for all languages -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha384-Uq05+JLko69eOiPr39ta9bh7kld5PKZoU+fF7g0EXTAriEollhZ+DrN8Q/Oi8J2Q" crossorigin="anonymous"></script>
 
     <!-- Marked.js - Deferred -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js" integrity="sha384-odPBjvtXVM/5hOYIr3A1dB+flh0c3wAT3bSesIOqEGmyUA4JoKf/YTWy0XKOYAY7" crossorigin="anonymous"></script>
 
     <!-- PDF.js - Deferred -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e" crossorigin="anonymous"></script>
 
     <!-- Chart.js - Deferred -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/variables.css">
@@ -60,11 +60,11 @@
     <link rel="stylesheet" href="css/sentinel.css">
 
     <style>
-        body {
+        /* Tailwind reset override — high-specificity selector avoids !important */
+        html body.antialiased {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            /* Background driven by CSS variables in variables.css — do NOT hardcode here */
-            background: var(--color-bg-gradient) !important;
-            background-attachment: fixed !important;
+            background: var(--color-bg-gradient);
+            background-attachment: fixed;
             min-height: 100vh;
         }
         
@@ -224,7 +224,7 @@
                     <input type="password" 
                            id="cerebras-api-key"
                            name="cerebras-api-key"
-                           autocomplete="off"
+                           autocomplete="current-password"
                            class="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-emerald-400 focus:outline-none transition-colors"
                            placeholder="csk-xxxxxxxxxxxxxxxxx"
                            aria-describedby="cerebras-help">
@@ -243,7 +243,7 @@
                     <input type="password" 
                            id="gemini-api-key"
                            name="gemini-api-key"
-                           autocomplete="off"
+                           autocomplete="current-password"
                            class="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-emerald-400 focus:outline-none transition-colors"
                            placeholder="AIzaxxxxxxxxxxxxxxxxx"
                            aria-describedby="gemini-help">
@@ -555,9 +555,9 @@
                     <h4 class="font-bold text-white mb-3 text-sm">Features</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li><a href="#/dashboard" class="hover:text-emerald-400 transition-colors">Dashboard</a></li>
-                        <li><button id="footer-history-btn" class="hover:text-emerald-400 transition-colors text-left">Chat History</button></li>
-                        <li><button id="footer-about-btn" class="hover:text-emerald-400 transition-colors text-left">About</button></li>
-                        <li><button id="footer-settings-btn" class="hover:text-emerald-400 transition-colors text-left">Settings</button></li>
+                        <li><button id="footer-history-btn" class="hover:text-emerald-400 transition-colors text-left" aria-label="Open chat history">Chat History</button></li>
+                        <li><button id="footer-about-btn" class="hover:text-emerald-400 transition-colors text-left" aria-label="Open about section">About</button></li>
+                        <li><button id="footer-settings-btn" class="hover:text-emerald-400 transition-colors text-left" aria-label="Open settings">Settings</button></li>
                     </ul>
                 </div>
 

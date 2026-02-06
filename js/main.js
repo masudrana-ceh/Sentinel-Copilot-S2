@@ -37,7 +37,7 @@ function checkReloadLoop() {
     
     // If last reload was more than 10 seconds ago, reset counter
     if (now - lastReload > RELOAD_WINDOW) {
-        localStorage.setItem(RELOAD_KEY, '1');
+        localStorage.setItem(RELOAD_KEY, '0');
         localStorage.setItem(RELOAD_TIMESTAMP_KEY, now.toString());
         return false;
     }
