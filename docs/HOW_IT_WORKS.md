@@ -529,5 +529,39 @@ The project uses **object literals with `Object.assign`** instead of ES6 classes
 
 ---
 
-*Document Version: 1.0 — February 2026*
+---
+
+## 13. Bugfix Audit (v1.6.1)
+
+Post-Phase 6 critical bug fixing round that resolved theme rendering, analytics persistence, and navigation issues.
+
+### Theme Cascade Fixes
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Themes didn't visually change | `index.html` inline `<style>` hardcoded `background: linear-gradient(#0a0a0f...)` | Changed to `var(--color-bg-gradient) !important` |
+| Tailwind classes overrode theme vars | `<body class="bg-gray-900">` fights CSS variables | Removed `bg-gray-900 text-white` |
+| `.glass-effect` ignored themes | Hardcoded `rgba()` values | Uses `var(--glass-bg)` with fallbacks |
+| Accent colors (emerald) didn't change | Tailwind utility classes have high specificity | Added 113-line `[data-theme]` override section in `variables.css` |
+
+### Analytics / Progress Fixes
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Quiz scores never saved | `getAnalytics()` missing `await` before `_get()` — Promise (truthy) skipped fallback | Added `await`, return `record \|\| default` |
+| Study time lost | `updateAnalytics()` crashed on `undefined.studyTime` | Defensive field initialization with `?.` fallbacks |
+| Export report crashed | `getAllReviews()` used `this.db` (undefined) | Changed to module-level `db` variable |
+| Session double-save race | `endSession()` cleared `currentSession` after async write | Clear immediately before write, add try/catch |
+
+### Navigation Fixes
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Back button showed stale dashboard | `showDashboard()` wasn't async — didn't await render | Made `async`, router awaits it |
+| Export button fired multiple times | Listener re-added on every dashboard render | Clone-and-replace deduplication |
+| Workspace cleanup errors | `destroy()` called async `endSession()` synchronously | Added `.catch()`, proper state cleanup |
+
+---
+
+*Document Version: 1.1 — February 2026*
 *S2-Sentinel Copilot by MIHx0 (Muhammad Izaz Haider)*

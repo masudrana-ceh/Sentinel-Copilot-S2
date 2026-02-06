@@ -192,41 +192,46 @@ function handleRoute() {
 
     isHandlingRoute = true;
 
+    // Run the actual routing async (await session save before rendering)
+    _handleRouteAsync().finally(() => {
+        setTimeout(() => {
+            isHandlingRoute = false;
+            setTimeout(() => { routeCallCount = 0; }, 2000);
+        }, 100);
+    });
+}
+
+async function _handleRouteAsync() {
     try {
         const hash = window.location.hash || '#/dashboard';
         const [, path, param] = hash.match(/#\/(\w+)\/?(.*)/) || [, 'dashboard', ''];
 
         console.log(`[Router #${routeCallCount}] Navigating to: ${path}${param ? '/' + param : ''}`);
 
-        // End any existing analytics session
-        Analytics.endSession();
+        // End any existing analytics session — MUST complete before rendering
+        await Analytics.endSession();
         Workspace.destroy();
 
         switch (path) {
             case 'subject':
                 if (param && SUBJECTS[param]) {
-                    showWorkspace(param);
+                    await showWorkspace(param);
                 } else {
-                    showDashboard();
+                    await showDashboard();
                 }
                 break;
 
             case 'dashboard':
             default:
-                showDashboard();
+                await showDashboard();
                 break;
         }
-    } finally {
-        // Release the lock after a short delay to prevent rapid repeated calls
-        setTimeout(() => {
-            isHandlingRoute = false;
-            // Reset counter after 2 seconds of no calls (successful navigation)
-            setTimeout(() => { routeCallCount = 0; }, 2000);
-        }, 100);
+    } catch (e) {
+        console.error('[Router] Error:', e);
     }
 }
 
-function showDashboard() {
+async function showDashboard() {
     AppState.setState({ 
         currentView: 'dashboard', 
         currentSubject: null 
@@ -234,22 +239,23 @@ function showDashboard() {
 
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
-        Dashboard.render(mainContent);
+        await Dashboard.render(mainContent);
+        console.log('[Router] Dashboard fully rendered with fresh data');
     }
 }
 
-function showWorkspace(subjectId) {
+async function showWorkspace(subjectId) {
     AppState.setState({ 
         currentView: 'workspace', 
         currentSubject: subjectId 
     });
 
     // Start analytics session
-    Analytics.startSession(subjectId);
+    await Analytics.startSession(subjectId);
 
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
-        Workspace.render(mainContent, subjectId);
+        await Workspace.render(mainContent, subjectId);
     }
 }
 
@@ -333,16 +339,20 @@ function setupGlobalListeners() {
     });
 
     // Track page visibility for session management
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener('visibilitychange', async () => {
         if (document.hidden) {
-            Analytics.endSession();
+            // Save session immediately when tab becomes hidden
+            await Analytics.endSession();
         } else if (AppState.get('currentSubject')) {
-            Analytics.startSession(AppState.get('currentSubject'));
+            // Resume session when tab becomes visible again
+            await Analytics.startSession(AppState.get('currentSubject'));
         }
     });
 
-    // Handle beforeunload
+    // Handle beforeunload — best-effort sync save
     window.addEventListener('beforeunload', () => {
+        // endSession is async, but we fire it anyway for best-effort save
+        // The real save happens on visibilitychange (which fires first)
         Analytics.endSession();
     });
 }

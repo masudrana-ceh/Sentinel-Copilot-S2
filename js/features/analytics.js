@@ -119,23 +119,32 @@ export const Analytics = {
     async endSession() {
         if (!this.currentSession) return;
 
-        const duration = Math.floor((Date.now() - this.currentSession.startTime) / 60000); // minutes
+        const session = this.currentSession;
+        this.currentSession = null; // Clear immediately to prevent double-saves
 
-        // Only record if session was meaningful (> 1 minute)
-        if (duration >= 1) {
-            await StorageIDB.updateAnalytics(this.currentSession.subjectId, {
-                studyTime: duration,
-                session: {
-                    timestamp: Date.now(),
-                    duration,
-                    interactions: this.currentSession.interactions
-                }
-            });
+        const elapsed = Date.now() - session.startTime;
+        const durationMinutes = Math.round(elapsed / 60000);
 
-            console.log(`[Analytics] Session ended: ${this.currentSession.subjectId}, ${duration} min`);
+        // Record if user had any interaction OR spent > 10 seconds
+        // Give at least 1 minute credit so progress is always visible
+        if (elapsed >= 10000 || session.interactions > 0) {
+            const creditMinutes = Math.max(durationMinutes, 1);
+
+            try {
+                await StorageIDB.updateAnalytics(session.subjectId, {
+                    studyTime: creditMinutes,
+                    session: {
+                        timestamp: Date.now(),
+                        duration: creditMinutes,
+                        interactions: session.interactions
+                    }
+                });
+
+                console.log(`[Analytics] Session ended: ${session.subjectId}, ${creditMinutes} min (${Math.round(elapsed/1000)}s real), ${session.interactions} interactions`);
+            } catch (e) {
+                console.error('[Analytics] Failed to save session:', e);
+            }
         }
-
-        this.currentSession = null;
     },
 
     // ═══════════════════════════════════════════════════════════════

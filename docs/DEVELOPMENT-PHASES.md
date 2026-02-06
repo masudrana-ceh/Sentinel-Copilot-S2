@@ -581,7 +581,68 @@ Week 6: Phase 6 (Polish & Deploy)
 
 ---
 
-**Document Version**: 2.0  
+---
+
+## 🔧 POST-PHASE BUGFIX ROUND (v1.6.1) ✅
+
+### 7.1 Theme Rendering (3 Cascade Killers)
+
+**Problem**: Selecting any theme from the picker had zero visual effect.
+
+**Root Causes Found**:
+1. `index.html` inline `<style>` block hardcoded `background: linear-gradient(135deg, #0a0a0f, #1a1a2e)` on body — overrode all CSS variable themes
+2. `<body class="bg-gray-900 text-white">` — Tailwind utility classes overrode theme variables
+3. `css/base.css` used `background-color` instead of `background` for body — couldn't override inline gradient
+4. `.glass-effect` and `.glass-dark` in CSS had hardcoded `rgba()` values ignoring theme variables
+
+**Fixes Applied**:
+- Inline style → `background: var(--color-bg-gradient) !important`
+- Removed `bg-gray-900 text-white` from `<body>`
+- `base.css` body uses `background: var(--color-bg-gradient)` with transition
+- Glass classes use `var(--glass-bg)` / `var(--glass-border)` with fallbacks
+- Added 113-line `[data-theme]` Tailwind override section in `variables.css`
+
+### 7.2 Analytics/Progress Pipeline (Silent Data Loss)
+
+**Problem**: Quiz scores, study time, charts, and progress tracker all showed zeros.
+
+**Root Cause**: `getAnalytics()` in `storage-idb.js` was missing `await` before `this._get()`. Since `_get()` returns a Promise (which is truthy), the `|| { default }` fallback never triggered. Result: `updateAnalytics()` tried to spread `undefined`, threw TypeError, caught silently.
+
+**Fixes Applied**:
+- Added `await` in `getAnalytics()`: `const record = await this._get(...); return record || default`
+- Defensive `updateAnalytics()` with explicit field initialization
+- Fixed `getAllReviews()`: `this.db` → module-level `db`
+- `endSession()`: try/catch, clear session before async write
+
+### 7.3 Navigation / Back Button (Stale Dashboard)
+
+**Problem**: Clicking back arrow changed URL to `#/dashboard` but dashboard content didn't reload.
+
+**Root Cause**: `showDashboard()` was a sync function that returned a Promise without awaiting it. Router moved on before data loaded.
+
+**Fixes Applied**:
+- `showDashboard()` made `async`, router fully `await`s it
+- Dashboard render shows loading state, fetches fresh data
+- Export button listener deduplication (clone-and-replace)
+- Workspace `destroy()` properly catches errors and clears state
+
+### 7.4 Files Changed (9 files, +245/−65)
+
+| File | Changes |
+|------|--------|
+| `css/variables.css` | +113 lines: Tailwind accent overrides for all themes |
+| `css/base.css` | body uses gradient var, `.glass-dark` uses vars |
+| `css/sentinel.css` | `.glass-effect` uses CSS variables with fallbacks |
+| `index.html` | Inline style → var, removed `bg-gray-900` |
+| `js/features/analytics.js` | `endSession()` hardened, try/catch, session clear |
+| `js/services/storage-idb.js` | `getAnalytics()` await fix, defensive merge, `db` ref fix |
+| `js/main.js` | `showDashboard()` async, router awaits fully |
+| `js/views/dashboard.js` | Loading state, listener dedup, async render |
+| `js/views/workspace.js` | `destroy()` catches errors, clears state, logging |
+
+---
+
+**Document Version**: 2.1  
 **Last Updated**: February 6, 2026  
 **Author**: S2-Sentinel Development Team (MIHx0)
 

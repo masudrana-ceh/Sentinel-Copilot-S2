@@ -3,8 +3,8 @@
 > **Hyper-Intelligent AI Study Platform for CS Engineering Semester 2**  
 > Built specifically for Howest University Belgium
 
-![Version](https://img.shields.io/badge/version-1.6.0-emerald)
-![Phase](https://img.shields.io/badge/phase-6%2F6-brightgreen)
+![Version](https://img.shields.io/badge/version-1.6.1-emerald)
+![Phase](https://img.shields.io/badge/phase-6%2F6%20%2B%20bugfix-brightgreen)
 ![Courses](https://img.shields.io/badge/courses-8-purple)
 ![Lines](https://img.shields.io/badge/lines-11.5k%2B-blue)
 ![AI](https://img.shields.io/badge/AI-Cerebras%20%7C%20Gemini-orange)
@@ -134,6 +134,16 @@ Ask questions, use tools, take quizzes, track your progress
 - [x] Toast notifications & loading states
 - [x] PWA manifest & service worker ready
 - [x] Full documentation (README, HOW_IT_WORKS, DEVELOPMENT-PHASES)
+
+### Post-Phase Bugfix Round (v1.6.1) ✅
+- [x] Fixed theme system — 3 CSS cascade killers resolved (inline styles, Tailwind conflicts)
+- [x] Added 113-line Tailwind override layer in `variables.css` for theme accent propagation
+- [x] Fixed progress/analytics — missing `await` in `getAnalytics()` caused silent data loss
+- [x] Fixed `getAllReviews()` — `this.db` → module-level `db` reference
+- [x] Defensive `updateAnalytics()` — explicit field initialization prevents crash on new subjects
+- [x] Async dashboard navigation — back button now properly awaits fresh data before rendering
+- [x] Session save hardened — try/catch in `endSession()`, double-save prevention
+- [x] Export button deduplication — clone-and-replace prevents listener stacking
 
 ---
 

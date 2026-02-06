@@ -299,7 +299,8 @@ export const StorageIDB = {
      */
     async getAnalytics(subjectId) {
         await this.init();
-        return this._get('analytics', subjectId) || {
+        const record = await this._get('analytics', subjectId);
+        return record || {
             subjectId,
             studyTime: 0,
             quizScores: [],
@@ -327,16 +328,23 @@ export const StorageIDB = {
         await this.init();
         
         const existing = await this.getAnalytics(subjectId);
-        const merged = { ...existing, subjectId };
+        const merged = {
+            subjectId,
+            studyTime: existing?.studyTime || 0,
+            quizScores: existing?.quizScores || [],
+            weakTopics: existing?.weakTopics || [],
+            sessions: existing?.sessions || [],
+            lastAccessed: existing?.lastAccessed || null
+        };
 
         // Merge numeric fields additively
         if (updates.studyTime) {
-            merged.studyTime = (existing.studyTime || 0) + updates.studyTime;
+            merged.studyTime = merged.studyTime + updates.studyTime;
         }
 
         // Append to arrays
         if (updates.quizScore !== undefined) {
-            merged.quizScores = [...(existing.quizScores || []), {
+            merged.quizScores = [...merged.quizScores, {
                 score: updates.quizScore,
                 total: updates.quizTotal || 10,
                 timestamp: Date.now()
@@ -344,7 +352,7 @@ export const StorageIDB = {
         }
 
         if (updates.session) {
-            merged.sessions = [...(existing.sessions || []), updates.session];
+            merged.sessions = [...merged.sessions, updates.session];
             // Keep last 100 sessions
             if (merged.sessions.length > 100) {
                 merged.sessions = merged.sessions.slice(-100);
@@ -352,7 +360,7 @@ export const StorageIDB = {
         }
 
         if (updates.weakTopic) {
-            merged.weakTopics = [...new Set([...(existing.weakTopics || []), updates.weakTopic])];
+            merged.weakTopics = [...new Set([...merged.weakTopics, updates.weakTopic])];
         }
 
         merged.lastAccessed = Date.now();
@@ -551,7 +559,7 @@ export const StorageIDB = {
         }
         // Return all reviews across all subjects
         return new Promise((resolve, reject) => {
-            const tx = this.db.transaction('quiz_reviews', 'readonly');
+            const tx = db.transaction('quiz_reviews', 'readonly');
             const store = tx.objectStore('quiz_reviews');
             const request = store.getAll();
             request.onsuccess = () => resolve(request.result || []);

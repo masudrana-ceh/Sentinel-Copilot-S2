@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="glass">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,7 +65,9 @@
     <style>
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%);
+            /* Background driven by CSS variables in variables.css — do NOT hardcode here */
+            background: var(--color-bg-gradient) !important;
+            background-attachment: fixed !important;
             min-height: 100vh;
         }
         
@@ -104,7 +106,7 @@
     </style>
 </head>
 
-<body class="bg-gray-900 text-white antialiased">
+<body class="antialiased">
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-emerald-500 focus:text-white focus:rounded-lg">
         Skip to main content

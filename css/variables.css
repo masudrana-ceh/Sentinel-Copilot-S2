@@ -188,3 +188,116 @@ body {
     --glass-border: 1px solid rgba(51, 255, 51, 0.25);
     --shadow-glow: 0 0 10px rgba(51, 255, 51, 0.4), 0 0 40px rgba(51, 255, 51, 0.1);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME-AWARE TAILWIND OVERRIDES
+   Remap hardcoded emerald accent classes to the active theme accent.
+   Only active when a non-default data-theme is set (glass = no attribute).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Accent text ───────────────────────────────────────────── */
+[data-theme] .text-emerald-300,
+[data-theme] .text-emerald-400,
+[data-theme] .text-emerald-500 {
+    color: var(--color-accent) !important;
+}
+
+/* ── Accent backgrounds ────────────────────────────────────── */
+[data-theme] .bg-emerald-400,
+[data-theme] .bg-emerald-500,
+[data-theme] .bg-emerald-600 {
+    background-color: var(--color-accent) !important;
+}
+
+/* ── Accent gradients (CTA buttons) ───────────────────────── */
+[data-theme] .from-emerald-400,
+[data-theme] .from-emerald-500,
+[data-theme] .from-emerald-600 {
+    --tw-gradient-from: var(--color-accent) !important;
+}
+[data-theme] .to-emerald-500,
+[data-theme] .to-emerald-600,
+[data-theme] .to-emerald-700 {
+    --tw-gradient-to: var(--color-accent-hover) !important;
+}
+[data-theme] .hover\:from-emerald-600:hover {
+    --tw-gradient-from: var(--color-accent-hover) !important;
+}
+[data-theme] .hover\:to-emerald-700:hover {
+    --tw-gradient-to: var(--color-accent-hover) !important;
+}
+
+/* ── Accent borders ────────────────────────────────────────── */
+[data-theme] .border-emerald-400,
+[data-theme] .border-emerald-500 {
+    border-color: var(--color-accent) !important;
+}
+[data-theme] .focus\:border-emerald-400:focus {
+    border-color: var(--color-accent) !important;
+}
+
+/* ── Accent ring ───────────────────────────────────────────── */
+[data-theme] .ring-emerald-400\/30 {
+    --tw-ring-color: var(--color-accent-dim) !important;
+}
+
+/* ── Accent icon inside gradient badge ─────────────────────── */
+[data-theme] .bg-gradient-to-br.from-emerald-400 {
+    --tw-gradient-from: var(--color-accent) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   Invert dark-first text / bg for legibility on light backgrounds
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="light"] .text-white {
+    color: var(--color-text-primary) !important;
+}
+[data-theme="light"] .text-gray-300 {
+    color: #334155 !important;
+}
+[data-theme="light"] .text-gray-400 {
+    color: var(--color-text-secondary) !important;
+}
+[data-theme="light"] .text-gray-500 {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .bg-gray-800,
+[data-theme="light"] .bg-gray-800\/50 {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+[data-theme="light"] .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+[data-theme="light"] .bg-gray-700\/50 {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .border-gray-700\/50,
+[data-theme="light"] .border-gray-700,
+[data-theme="light"] .border-gray-600 {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+[data-theme="light"] .hover\:bg-gray-700\/50:hover {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="light"] .hover\:text-white:hover {
+    color: var(--color-text-primary) !important;
+}
+
+/* Light theme — header / modal glass */
+[data-theme="light"] header {
+    background: rgba(248, 250, 252, 0.85) !important;
+    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+[data-theme="light"] dialog article {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ── Hacker theme: force monospace on all UI text ──────────── */
+[data-theme="hacker"] * {
+    font-family: 'Courier New', monospace !important;
+}

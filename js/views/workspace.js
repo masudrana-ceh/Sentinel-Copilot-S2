@@ -27,8 +27,12 @@ export const Workspace = {
      */
     async render(container, subjectId) {
         this.currentSubject = SUBJECTS[subjectId];
-        if (!this.currentSubject) return;
+        if (!this.currentSubject) {
+            console.error('[Workspace] Invalid subject:', subjectId);
+            return;
+        }
 
+        console.log('[Workspace] Rendering:', subjectId);
         container.innerHTML = this.getTemplate();
 
         // Render initial tab (chat)
@@ -42,13 +46,23 @@ export const Workspace = {
 
         // Show greeting
         this.addMessage(PromptBuilder.getGreeting(subjectId), 'ai');
+        
+        console.log('[Workspace] Render complete');
     },
 
     /**
      * Cleanup when leaving workspace
      */
     destroy() {
-        Analytics.endSession();
+        // End analytics session without awaiting (called synchronously from router)
+        Analytics.endSession().catch(err => console.warn('[Workspace] Cleanup error:', err));
+        
+        // Clear state
+        this.currentSubject = null;
+        this.toolContext = null;
+        this.lastToolResult = null;
+        
+        console.log('[Workspace] Destroyed and cleaned up');
     },
 
     getTemplate() {
